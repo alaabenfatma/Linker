@@ -19,7 +19,7 @@ bin_PROGRAMS=
 bin_PROGRAMS+=ARM_runner_example
 
 
-COMMON=debug.h debug.c util.h util.c
+COMMON=debug.h debug.c util.h util.c elf_dumper.c
 
 EXTRA_DIST=filtre.pl
 SIMULATOR_INTERFACE=csapp.h csapp.c scanner.h scanner.l gdb_protocol.h gdb_protocol.c arm_simulator_interface.h arm_simulator_interface.c
