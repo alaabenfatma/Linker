@@ -1,4 +1,3 @@
-//Voir declarations elf.h
 #include <inttypes.h>
 
 #include <stdio.h>
