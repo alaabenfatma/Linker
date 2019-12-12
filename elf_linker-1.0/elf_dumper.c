@@ -8,9 +8,9 @@ typedef struct{
     uint8_t ID[16];
     uint16_t File_Type;
     uint16_t Machine_Cible;
-    uint16_t Version;
-
+    uint32_t Version;
 }HEAD;
+
 //local header
 HEAD header;
 void read_magic(FILE *file){
@@ -105,8 +105,20 @@ void get_os(){
     printf("\n");
 }
 void get_ABI(){
-    printf("%x\n",header.ID[8]);
+    printf("Version ABI: %x\n",header.ID[8]);
 }
+void type_fichier(FILE* file){
+    printf("Type: ");
+    switch(header.File_Type){
+        case 0x0: printf("Type inconnu"); break;
+        case 0x1: printf("REL"); break;
+        case 0x2: printf("EXEC"); break;
+        case 0x3: printf("DYN"); break;
+        case 0x4: printf("CORE"); break;
+    }
+    printf("\n");
+}
+
 int main(int argc, char * argv[]) {
     FILE * file = fopen(argv[1], "rb");
     read_magic(file);
@@ -115,5 +127,6 @@ int main(int argc, char * argv[]) {
     get_version();
     get_os();
     get_ABI();
+    type_fichier(file);
   return 0;
 }
