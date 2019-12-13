@@ -44,18 +44,18 @@ void get_donnees(){
         printf("Données: Format de données inconnu.\n");
     }
     else if(header.e_ident[5]==0x1){
-        printf("Données: Complément à deux, petit boutiste.\n");
+        printf("Données: complément à 2, système à octets de poids faible d'abord (little endian) \n");
     }
     else if(header.e_ident[5]==0x2){
-        printf("Données: Complément à deux, gros boutiste.\n");
+        printf("Données: Complément à 2, système à octets de poids fort d'abord (big endian)\n");
     }
 }
 void get_e_version(){
     if(header.e_ident[6]==0x0){
-        printf("e_version: 0 (e_version non valable)\n");
+        printf("Version: 0 (e_version non valable)\n");
     }
     else if(header.e_ident[6]==0x1){
-        printf("e_version: 1 (current)\n");
+        printf("Version: 1 (current)\n");
     }
 }
 void get_os(){
@@ -96,7 +96,7 @@ void get_os(){
     printf("\n");
 }
 void get_ABI(){
-    printf("e_version ABI: %x\n",header.e_ident[8]);
+    printf("Version ABI: %x\n",header.e_ident[8]);
 }
 void type_fichier(){
     printf("Type: ");
@@ -130,7 +130,49 @@ void get_machine(){
 }
 
 void get_e_version2(){
-    printf("e_version: 0x%x \n", header.e_version);
+    printf("Version: 0x%x \n", header.e_version);
+}
+
+void get_e_entry(){
+    printf("Adresse du point d'entrée: 0x%lx \n", header.e_entry);
+}
+
+void get_e_phoff(){
+    printf("Début des en-têtes de programme : %lx (octets dans le fichier)\n", header.e_phoff);
+}
+
+void get_e_shoff(){
+    printf("Début des en-têtes de section : %li (octets dans le fichier)\n", header.e_shoff);
+}
+
+void get_e_flags(){
+    printf("Fanions : 0x%x\n", header.e_flags);
+}
+
+void get_e_ehsize(){
+    printf("Taille de cet en-tête: %i (octets)\n", header.e_ehsize);
+}
+
+void get_e_phentsize(){
+    printf("Taille de l'en-tête du programme: %d (octets)\n", header.e_phentsize);
+}
+
+
+void get_e_phnum (){
+    printf("Nombre d'en-tête du programme: %d  \n", header.e_phnum);
+}
+
+
+void get_e_shentsize (){
+    printf("Taille des en-têtes de section:  %d (octets) \n", header.e_shentsize);
+}
+
+void get_e_shnum(){
+    printf("Nombre d'en-têtes de section:   %d \n", header.e_shnum);
+}
+
+void get_e_shstrndx(){
+    printf("Table d'indexes des chaînes d'en-tête de section: %d \n", header.e_shstrndx);
 }
 
 int main(int argc, char * argv[]) {
@@ -144,5 +186,15 @@ int main(int argc, char * argv[]) {
     type_fichier();
     get_machine();
     get_e_version2();
+    get_e_entry();
+    get_e_phoff();
+    get_e_shoff();
+    get_e_flags();
+    get_e_ehsize();
+    get_e_phentsize();
+    get_e_phnum ();
+    get_e_shentsize ();
+    get_e_shnum();
+    get_e_shstrndx();
   return 0;
 }
