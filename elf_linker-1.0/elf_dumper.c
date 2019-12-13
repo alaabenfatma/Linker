@@ -107,7 +107,7 @@ void get_os(){
 void get_ABI(){
     printf("Version ABI: %x\n",header.ID[8]);
 }
-void type_fichier(FILE* file){
+void type_fichier(){
     printf("Type: ");
     switch(header.File_Type){
         case 0x0: printf("Type inconnu"); break;
@@ -119,6 +119,29 @@ void type_fichier(FILE* file){
     printf("\n");
 }
 
+void get_machine(){
+        printf("Machine Cible: ");
+        switch(header.Machine_Cible){
+                case 0x0: printf("Aucune\n");break;
+                case 0x2: printf("SPARC\n");break;
+                case 0x3: printf("Intel 80386\n");break;
+                case 0x4: printf("Motorola 68000\n");break;
+                case 0x7: printf("Intel i860\n");break;
+                case 0x8: printf("MIPS I\n");break;
+                case 0x13: printf("Intel i960\n");break;
+                case 0x14: printf("PowerPC\n");break;
+                case 0x28: printf("ARM\n");break;
+                case 0x32: printf("Intel IA64\n");break;
+                case 0x3E: printf("x64\n");break;
+                case 0xF3: printf("RISC-V\n");break;
+                default: printf("\n");break;
+        }
+}
+
+void get_version2(){
+    printf("Version: 0x%x \n", header.Version);
+}
+
 int main(int argc, char * argv[]) {
     FILE * file = fopen(argv[1], "rb");
     read_magic(file);
@@ -127,6 +150,8 @@ int main(int argc, char * argv[]) {
     get_version();
     get_os();
     get_ABI();
-    type_fichier(file);
+    type_fichier();
+    get_machine();
+    get_version2();
   return 0;
 }
