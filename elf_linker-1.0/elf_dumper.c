@@ -111,7 +111,7 @@ void type_fichier(){
 }
 
 void get_machine(){
-        printf("Machine Cible: ");
+        printf("Machine : ");
         switch(header.e_machine){
           case 0	: printf("No machine"); break;
           case 1	: printf("AT&T WE 32100"); break;
@@ -296,7 +296,7 @@ void get_machine(){
 
 
 void get_e_version2(){
-    printf("Version: 0x%x \n", header.e_version);
+    printf("\nVersion: 0x%x \n", header.e_version);
 }
 
 void get_e_entry(){
