@@ -3,30 +3,35 @@
 //local header
 Elf64_Ehdr header;
 Elf64_Shdr section;
+char *sec_names = NULL;
 void load_data(FILE *file)
 {
     if (file)
     {
-        if(!fread(&header, 1, sizeof(header), file))
-            {
-                printf("Error");
-                exit(1);
-            }
-        if(!fread(&section, 1, sizeof(section), file)){
+        if (!fread(&header, 1, sizeof(header), file))
+        {
             printf("Error");
-                exit(1);
+            exit(1);
+        }
+        fseek(file, header.e_shoff + header.e_shstrndx * sizeof(section), SEEK_SET);
+        if (!fread(&section, 1, sizeof(section), file))
+        {
+            printf("Error");
+            exit(1);
         }
         if (header.e_ident[0] == 0x7f && header.e_ident[1] == 'E' && header.e_ident[2] == 'L' && header.e_ident[3] == 'F')
         {
-            //ignore 
+            //ignore
         }
         else
         {
             printf("Not a valid ELF format.\n");
             exit(1);
         }
-
-        fclose(file);
+        //Lire les noms of sections
+        sec_names = malloc(section.sh_size);
+        fseek(file, section.sh_offset, SEEK_SET);
+        fread(sec_names, 1, section.sh_size, file);
     }
     else
     {
@@ -749,7 +754,7 @@ void get_e_shstrndx()
 
 void get_sh_name()
 {
-    printf("Nom de la section: %x \n", section.sh_name);
+    printf("Nom de la section: '%c' \n", section.sh_name);
 }
 
 void get_sh_type()
@@ -865,7 +870,8 @@ void surf_sections()
         printf("%c", (section.sh_name + i));
     }
 }
-void etape1(FILE *f){
+void etape1(FILE *f)
+{
     load_data(f);
     get_magic();
     get_class();
@@ -886,12 +892,90 @@ void etape1(FILE *f){
     get_e_shentsize();
     get_e_shnum();
     get_e_shstrndx();
-    get_sh_name();
-    get_sh_type();
-    surf_sections();
 }
-int main(int argc, char * argv[]){
+void etape2(FILE *file)
+{
+    for (int i = 0; i < header.e_shnum; i++)
+    {
+        fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
+        fread(&section, 1, sizeof(section), file);
+        printf("\n--- NEW SECTION ---\n");
+        printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
+        printf("Type:\t");
+        switch (section.sh_type)
+        {
+        case 0x0:
+            printf("NULL");
+            break;
+        case 0x1:
+            printf("PROGBITS");
+            break;
+        case 0x2:
+            printf("SYMTAB");
+            break;
+        case 0x3:
+            printf("STRTAB");
+            break;
+        case 0x4:
+            printf("RELA");
+            break;
+        case 0x5:
+            printf("HASH");
+            break;
+        case 0x6:
+            printf("DYNAMIC");
+            break;
+        case 0x7:
+            printf("NOTE");
+            break;
+        case 0x8:
+            printf("NOBITS");
+            break;
+        case 0x9:
+            printf("REL");
+            break;
+        case 0x0A:
+            printf("SHLIB");
+            break;
+
+        default:
+            printf("Type inconnu");
+            break;
+        }
+        printf("\n");
+        printf("Properties (flag %x)\n",section.sh_flags);
+        switch (section.sh_flags)
+        {
+            case 0x0:
+            printf("No speciale properties.");
+            break;
+        case 0x1:
+            printf("Cette partie est modifiable?");
+            break;
+        case 0x2:
+            printf("Cette partie occupe une partie de memoire pendant l'execution.");
+            break;
+        
+        case 0x4:
+            printf("Cette partie est executable.");
+            break;
+        case 0x40:
+            printf("'sh_info' contains SHT index ");
+            break;
+        default:
+        printf("Une partie... too lazy, many names.");
+            break;
+        }
+    printf("\n");
+    printf("Position of section (en octets) :\t%o\n",section.sh_offset);
+
+    }
+}
+int main(int argc, char *argv[])
+{
     FILE *file = fopen(argv[1], "rb");
     etape1(file);
+    etape2(file);
+    fclose(file);
     return 0;
 }
