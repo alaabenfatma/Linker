@@ -8,12 +8,14 @@
 //local header
 Elf64_Ehdr header;
 Elf64_Shdr section;
+
 void read_magic(FILE *file){
   //Il faut essayer avec le fichier foo.o
 
   if (file) {
     fread( & header, 1, sizeof(header), file);
-    fseek(file, header.e_shoff + header.e_shstrndx * sizeof section , SEEK_SET);
+    //fseek(file, header.e_shoff + header.e_shstrndx * sizeof section , SEEK_SET);
+    fseek(file, header.e_shoff +4 * sizeof section , SEEK_SET);
     fread( & section, sizeof(uint32_t), sizeof(section), file);
     if (header.e_ident[0] == 0x7f && header.e_ident[1] == 'E' && header.e_ident[2] == 'L' && header.e_ident[3] == 'F') {
       printf("Magique: ");
@@ -345,7 +347,7 @@ void get_e_shstrndx(){
 }
 
 void get_sh_name(){
-    printf("Nom de la section: %x \n", section.sh_name);
+    printf("Nom de la section: %d \n", section.sh_name);
 }
 
 void get_sh_type(){
@@ -384,9 +386,15 @@ void get_sh_type(){
         case 0x7fffffff	: printf("End of processor-specific"); break;
         case 0x80000000	: printf("Start of application-specific"); break;
         case 0x8fffffff	: printf("End of application-specific"); break;
-        default : printf("ouin ouin"); break;
     }
 }
+
+void get_sh_size(){
+    printf("\nTaille de la section: 0x%lx \n", section.sh_size);
+}
+
+
+
 
 int main(int argc, char * argv[]) {
     FILE * file = fopen(argv[1], "rb");
@@ -411,5 +419,6 @@ int main(int argc, char * argv[]) {
     get_e_shstrndx();
     get_sh_name();
     get_sh_type();
+    get_sh_size();
   return 0;
 }
