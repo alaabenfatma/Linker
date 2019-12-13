@@ -28,10 +28,6 @@ void load_data(FILE *file)
             printf("Not a valid ELF format.\n");
             exit(1);
         }
-        //Lire les noms of sections
-        sec_names = malloc(section.sh_size);
-        fseek(file, section.sh_offset, SEEK_SET);
-        fread(sec_names, 1, section.sh_size, file);
     }
     else
     {
@@ -870,6 +866,13 @@ void surf_sections()
         printf("%c", (section.sh_name + i));
     }
 }
+void get_section_names(FILE *file)
+{
+    //Lire les noms of sections
+    sec_names = malloc(section.sh_size);
+    fseek(file, section.sh_offset, SEEK_SET);
+    fread(sec_names, 1, section.sh_size, file);
+}
 void etape1(FILE *f)
 {
     load_data(f);
@@ -893,83 +896,88 @@ void etape1(FILE *f)
     get_e_shnum();
     get_e_shstrndx();
 }
-void etape2(FILE *file)
+//TODO Please change the function name later on. 
+void dump_sections(FILE *file, int i)
 {
-    for (int i = 0; i < header.e_shnum; i++)
+    if(i==header.e_shnum)
+        return;
+    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
+    fread(&section, 1, sizeof(section), file);
+    printf("\n--- NEW SECTION ---\n");
+    printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
+    printf("Type:\t");
+    switch (section.sh_type)
     {
-        fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-        fread(&section, 1, sizeof(section), file);
-        printf("\n--- NEW SECTION ---\n");
-        printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
-        printf("Type:\t");
-        switch (section.sh_type)
-        {
-        case 0x0:
-            printf("NULL");
-            break;
-        case 0x1:
-            printf("PROGBITS");
-            break;
-        case 0x2:
-            printf("SYMTAB");
-            break;
-        case 0x3:
-            printf("STRTAB");
-            break;
-        case 0x4:
-            printf("RELA");
-            break;
-        case 0x5:
-            printf("HASH");
-            break;
-        case 0x6:
-            printf("DYNAMIC");
-            break;
-        case 0x7:
-            printf("NOTE");
-            break;
-        case 0x8:
-            printf("NOBITS");
-            break;
-        case 0x9:
-            printf("REL");
-            break;
-        case 0x0A:
-            printf("SHLIB");
-            break;
+    case 0x0:
+        printf("NULL");
+        break;
+    case 0x1:
+        printf("PROGBITS");
+        break;
+    case 0x2:
+        printf("SYMTAB");
+        break;
+    case 0x3:
+        printf("STRTAB");
+        break;
+    case 0x4:
+        printf("RELA");
+        break;
+    case 0x5:
+        printf("HASH");
+        break;
+    case 0x6:
+        printf("DYNAMIC");
+        break;
+    case 0x7:
+        printf("NOTE");
+        break;
+    case 0x8:
+        printf("NOBITS");
+        break;
+    case 0x9:
+        printf("REL");
+        break;
+    case 0x0A:
+        printf("SHLIB");
+        break;
 
-        default:
-            printf("Type inconnu");
-            break;
-        }
-        printf("\n");
-        printf("Properties (flag %x)\n",section.sh_flags);
-        switch (section.sh_flags)
-        {
-            case 0x0:
-            printf("No speciale properties.");
-            break;
-        case 0x1:
-            printf("Cette partie est modifiable?");
-            break;
-        case 0x2:
-            printf("Cette partie occupe une partie de memoire pendant l'execution.");
-            break;
-        
-        case 0x4:
-            printf("Cette partie est executable.");
-            break;
-        case 0x40:
-            printf("'sh_info' contains SHT index ");
-            break;
-        default:
-        printf("Une partie... too lazy, many names.");
-            break;
-        }
-    printf("\n");
-    printf("Position of section (en octets) :\t%o\n",section.sh_offset);
-
+    default:
+        printf("Type inconnu");
+        break;
     }
+    printf("\n");
+    printf("Properties (flag %x)\n", section.sh_flags);
+    switch (section.sh_flags)
+    {
+    case 0x0:
+        printf("No speciale properties.");
+        break;
+    case 0x1:
+        printf("Cette partie est modifiable?");
+        break;
+    case 0x2:
+        printf("Cette partie occupe une partie de memoire pendant l'execution.");
+        break;
+
+    case 0x4:
+        printf("Cette partie est executable.");
+        break;
+    case 0x40:
+        printf("'sh_info' contains SHT index ");
+        break;
+    default:
+        printf("Une partie... too lazy, many names.");
+        break;
+    }
+    printf("\n");
+    printf("Position of section (en octets) :\t%o\n", section.sh_offset);
+    dump_sections(file,i+1);
+
+}
+void etape2(FILE *f){
+    get_section_names(f);
+    dump_sections(f,0);
 }
 int main(int argc, char *argv[])
 {
