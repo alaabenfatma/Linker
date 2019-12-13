@@ -7,11 +7,14 @@
 
 //local header
 Elf64_Ehdr header;
+Elf64_Shdr section;
 void read_magic(FILE *file){
   //Il faut essayer avec le fichier foo.o
 
   if (file) {
     fread( & header, 1, sizeof(header), file);
+    fseek(file, header.e_shoff + header.e_shstrndx * sizeof section , SEEK_SET);
+    fread( & section, sizeof(uint32_t), sizeof(section), file);
     if (header.e_ident[0] == 0x7f && header.e_ident[1] == 'E' && header.e_ident[2] == 'L' && header.e_ident[3] == 'F') {
       printf("Magique: ");
       for (int i = 0; i < 16; i++) {
@@ -341,6 +344,50 @@ void get_e_shstrndx(){
     printf("Table d'indexes des chaînes d'en-tête de section: %d \n", header.e_shstrndx);
 }
 
+void get_sh_name(){
+    printf("Nom de la section: %x \n", section.sh_name);
+}
+
+void get_sh_type(){
+    printf("Type de la section: ");
+    switch(section.sh_type){ 
+        case 0		: printf("Section header table entry unused"); break;
+        case 1		: printf("Program data"); break;
+        case 2		: printf("Symbol table"); break;
+        case 3		: printf("String table"); break;
+        case 4		: printf("Relocation entries with addends"); break;
+        case 5		: printf("Symbol hash table"); break;
+        case 6		: printf("Dynamic linking information"); break;
+        case 7		: printf("Notes"); break;
+        case 8		: printf("Program space with no data (bss)"); break;
+        case 9		: printf("Relocation entries, no addends"); break;
+        case 10		: printf("Reserved"); break;
+        case 11		: printf("Dynamic linker symbol table"); break;
+        case 14		: printf("Array of constructors"); break;
+        case 15		: printf("Array of destructors"); break;
+        case 16		: printf("Array of pre-constructors"); break;
+        case 17		: printf("Section group "); break;
+        case 18		: printf("Extended section indeces"); break;
+        case 19		: printf("Number of defined types."); break;
+        case 0x60000000	: printf("Start OS-specific."); break;
+        case 0x6ffffff5	: printf("Object attributes."); break;
+        case 0x6ffffff6	: printf("GNU-style hash table."); break;
+        case 0x6ffffff7	: printf("Prelink library list"); break;
+        case 0x6ffffff8	: printf("Checksum for DSO content."); break;
+        case 0x6ffffffa	: printf("Sun-specific low bound."); break;
+        case 0x6ffffffd	: printf("Version definition section."); break;
+        case 0x6ffffffe	: printf("Version needs section."); break;
+        case 0x6fffffff	: printf("Version symbol table."); break;
+        //case 0x6fffffff	: printf("Sun-specific high bound."); break;
+        //case 0x6fffffff	: printf("End OS-specific type"); break;
+        case 0x70000000	: printf("Start of processor-specific"); break;
+        case 0x7fffffff	: printf("End of processor-specific"); break;
+        case 0x80000000	: printf("Start of application-specific"); break;
+        case 0x8fffffff	: printf("End of application-specific"); break;
+        default : printf("ouin ouin"); break;
+    }
+}
+
 int main(int argc, char * argv[]) {
     FILE * file = fopen(argv[1], "rb");
     read_magic(file);
@@ -362,5 +409,7 @@ int main(int argc, char * argv[]) {
     get_e_shentsize ();
     get_e_shnum();
     get_e_shstrndx();
+    get_sh_name();
+    get_sh_type();
   return 0;
 }
