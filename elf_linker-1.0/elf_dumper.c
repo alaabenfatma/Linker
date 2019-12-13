@@ -10,7 +10,7 @@ Elf64_Ehdr header;
 Elf64_Shdr section;
 void read_magic(FILE *file){
   //Il faut essayer avec le fichier foo.o
-
+ 
   if (file) {
     fread( & header, 1, sizeof(header), file);
     fread( & section, sizeof(uint32_t), sizeof(section), file);
