@@ -396,6 +396,7 @@ void get_sh_size(){
 
 
 
+
 int main(int argc, char * argv[]) {
     FILE * file = fopen(argv[1], "rb");
     read_magic(file);
