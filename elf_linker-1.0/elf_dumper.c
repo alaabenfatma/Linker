@@ -111,7 +111,7 @@ void type_fichier(){
 }
 
 void get_machine(){
-        printf("Machine Cible: ");
+        printf("Machine : ");
         switch(header.e_machine){
                 case 0x0: printf("Aucune\n");break;
                 case 0x2: printf("SPARC\n");break;
@@ -123,7 +123,7 @@ void get_machine(){
                 case 0x14: printf("PowerPC\n");break;
                 case 0x28: printf("ARM\n");break;
                 case 0x32: printf("Intel IA64\n");break;
-                case 0x3E: printf("x64\n");break;
+                case 0x3E: printf("x86-64\n");break;
                 case 0xF3: printf("RISC-V\n");break;
                 default: printf("\n");break;
         }
