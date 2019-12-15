@@ -896,10 +896,10 @@ void etape1(FILE *f)
     get_e_shnum();
     get_e_shstrndx();
 }
-//TODO Please change the function name later on. 
+//TODO Please change the function name later on.
 void dump_sections(FILE *file, int i)
 {
-    if(i==header.e_shnum)
+    if (i == header.e_shnum)
         return;
     fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
     fread(&section, 1, sizeof(section), file);
@@ -947,43 +947,63 @@ void dump_sections(FILE *file, int i)
         break;
     }
     printf("\n");
-    printf("Properties (flag %x)\n", section.sh_flags);
-    switch (section.sh_flags)
-    {
-    case 0x0:
-        printf("No speciale properties.");
-        break;
-    case 0x1:
-        printf("Cette partie est modifiable?");
-        break;
-    case 0x2:
-        printf("Cette partie occupe une partie de memoire pendant l'execution.");
-        break;
-
-    case 0x4:
-        printf("Cette partie est executable.");
-        break;
-    case 0x40:
-        printf("'sh_info' contains SHT index ");
-        break;
-    default:
-        printf("Une partie... too lazy, many names.");
-        break;
-    }
+    printf("Properties (flag %x) : ", section.sh_flags);
+    //Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#Section_header
+    if(section.sh_flags & SHF_WRITE)
+        printf("W");
+    if(section.sh_flags & SHF_ALLOC)
+        printf("A");
+    if(section.sh_flags & SHF_EXECINSTR)
+        printf("X");
+    if(section.sh_flags & SHF_MERGE)
+        printf("M");
+    if(section.sh_flags & SHF_STRINGS)
+        printf("S");
+    if(section.sh_flags & SHF_INFO_LINK )
+        printf("I");
+    if(section.sh_flags & SHF_LINK_ORDER)
+        printf("L");
+    if(section.sh_flags & SHF_OS_NONCONFORMING)
+        printf("O");
+    if(section.sh_flags & SHF_GROUP )
+        printf("G");
+    if(section.sh_flags & SHF_TLS)
+        printf("T");
+    if(section.sh_flags & SHF_EXCLUDE)
+        printf("E");
     printf("\n");
     printf("Position of section (en octets) :\t%o\n", section.sh_offset);
-    dump_sections(file,i+1);
-
+    dump_sections(file, i + 1);
 }
-void etape2(FILE *f){
+void etape2(FILE *f)
+{
     get_section_names(f);
-    dump_sections(f,0);
+    dump_sections(f, 0);
+}
+void etape3(FILE *f,int x)
+{
+    char ch;
+    int i;
+    fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
+    fread(&section, 1, sizeof(section), f);
+    const unsigned char *pc = &section.sh_addralign;
+    unsigned char buff[17];
+    //TODO: Show section name:
+    // Process every byte in the data.
+    printf("0x%08x\n",section.sh_name);
+    printf("%s",sec_names + section.sh_name);
+    for (size_t i = 0; i < section.sh_size; i++)
+    {
+        printf("%c",pc[i]);
+    }
+    
 }
 int main(int argc, char *argv[])
 {
     FILE *file = fopen(argv[1], "rb");
     etape1(file);
     etape2(file);
+    etape3(file,5);
     fclose(file);
     return 0;
 }
