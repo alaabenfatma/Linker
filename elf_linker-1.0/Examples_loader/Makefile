@@ -86,9 +86,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-#noinst_PROGRAMS = example1$(EXEEXT) \
-#	example2$(EXEEXT) example3$(EXEEXT) \
-#	example4$(EXEEXT)
+noinst_PROGRAMS = example1$(EXEEXT) \
+	example2$(EXEEXT) example3$(EXEEXT) \
+	example4$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../m4/ax_check_compile_flag.m4 \
@@ -105,19 +105,19 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am__example1_SOURCES_DIST = example1.s
-#am_example1_OBJECTS = example1.$(OBJEXT)
+am_example1_OBJECTS = example1.$(OBJEXT)
 example1_OBJECTS = $(am_example1_OBJECTS)
 example1_LDADD = $(LDADD)
 am__example2_SOURCES_DIST = example2.s
-#am_example2_OBJECTS = example2.$(OBJEXT)
+am_example2_OBJECTS = example2.$(OBJEXT)
 example2_OBJECTS = $(am_example2_OBJECTS)
 example2_LDADD = $(LDADD)
 am__example3_SOURCES_DIST = example3.s
-#am_example3_OBJECTS = example3.$(OBJEXT)
+am_example3_OBJECTS = example3.$(OBJEXT)
 example3_OBJECTS = $(am_example3_OBJECTS)
 example3_LDADD = $(LDADD)
 am__example4_SOURCES_DIST = example4.s
-#am_example4_OBJECTS = example4.$(OBJEXT)
+am_example4_OBJECTS = example4.$(OBJEXT)
 example4_OBJECTS = $(am_example4_OBJECTS)
 example4_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_$(V))
@@ -205,19 +205,19 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/karna/Desktop/PROG/Linker/elf_linker-1.0/build-aux/missing aclocal-1.16
+ACLOCAL = ${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing aclocal-1.16
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/karna/Desktop/PROG/Linker/elf_linker-1.0/build-aux/missing autoconf
-AUTOHEADER = ${SHELL} /home/karna/Desktop/PROG/Linker/elf_linker-1.0/build-aux/missing autoheader
-AUTOMAKE = ${SHELL} /home/karna/Desktop/PROG/Linker/elf_linker-1.0/build-aux/missing automake-1.16
-AWK = mawk
-CC = gcc
-CCAS = gcc
+AUTOCONF = ${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing autoconf
+AUTOHEADER = ${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing autoheader
+AUTOMAKE = ${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing automake-1.16
+AWK = gawk
+CC = arm-none-eabi-gcc
+CCAS = arm-none-eabi-gcc
 CCASDEPMODE = depmode=gcc3
-CCASFLAGS = 
+CCASFLAGS = -g -O2
 CCDEPMODE = depmode=gcc3
-CFLAGS = 
+CFLAGS = -g -O2
 CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
@@ -235,9 +235,9 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/karna/Desktop/PROG/Linker/elf_linker-1.0/build-aux/missing makeinfo
+MAKEINFO = ${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing makeinfo
 MKDIR_P = /bin/mkdir -p
-OBJEXT = 
+OBJEXT = o
 PACKAGE = arm-examples
 PACKAGE_BUGREPORT = Guillaume.Huard@imag.fr
 PACKAGE_NAME = Arm Examples
@@ -248,15 +248,15 @@ PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
 SET_MAKE = 
 SHELL = /bin/bash
-STRIP = 
-VD_CROSS_NOPIE_CFLAGS = 
-VD_CROSS_NOSTDLIB_LDFLAGS = 
+STRIP = arm-none-eabi-strip
+VD_CROSS_NOPIE_CFLAGS = -no-pie
+VD_CROSS_NOSTDLIB_LDFLAGS = -nostdlib -Wl,--entry=0
 VERSION = 1.0
-abs_builddir = /home/karna/Desktop/PROG/Linker/elf_linker-1.0/Examples_loader
-abs_srcdir = /home/karna/Desktop/PROG/Linker/elf_linker-1.0/Examples_loader
-abs_top_builddir = /home/karna/Desktop/PROG/Linker/elf_linker-1.0/Examples_loader
-abs_top_srcdir = /home/karna/Desktop/PROG/Linker/elf_linker-1.0/Examples_loader
-ac_ct_CC = gcc
+abs_builddir = /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/Examples_loader
+abs_srcdir = /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/Examples_loader
+abs_top_builddir = /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/Examples_loader
+abs_top_srcdir = /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/Examples_loader
+ac_ct_CC = 
 am__include = include
 am__leading_dot = .
 am__quote = 
@@ -270,11 +270,11 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host_alias = 
+host_alias = arm-none-eabi
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/karna/Desktop/PROG/Linker/elf_linker-1.0/build-aux/install-sh
+install_sh = ${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -297,8 +297,8 @@ top_srcdir = .
 ACLOCAL_AMFLAGS = -I ../m4
 
 # big endian and no code transformations to work with thumb
-#AM_CFLAGS = -mbig-endian -mno-thumb-interwork
-#AM_CCASFLAGS = -mbig-endian -mno-thumb-interwork
+AM_CFLAGS = -mbig-endian -mno-thumb-interwork
+AM_CCASFLAGS = -mbig-endian -mno-thumb-interwork
 
 # common flags to link without any additionnal std stuff
 
@@ -307,14 +307,14 @@ ACLOCAL_AMFLAGS = -I ../m4
 #AM_LDFLAGS+=-T linker_script
 
 # Big endian
-#AM_LDFLAGS = -nostdlib --entry main -n \
-#	-Wl,--section-start -Wl,.text=0x20 \
-#	-Wl,--section-start -Wl,.data=0x2800 \
-#	-Wl,-EB
-#example1_SOURCES = example1.s
-#example2_SOURCES = example2.s
-#example3_SOURCES = example3.s
-#example4_SOURCES = example4.s
+AM_LDFLAGS = -nostdlib --entry main -n \
+	-Wl,--section-start -Wl,.text=0x20 \
+	-Wl,--section-start -Wl,.data=0x2800 \
+	-Wl,-EB
+example1_SOURCES = example1.s
+example2_SOURCES = example2.s
+example3_SOURCES = example3.s
+example4_SOURCES = example4.s
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
