@@ -3,7 +3,13 @@
 //local header
 Elf64_Ehdr header;
 Elf64_Shdr section;
+Elf64_Sym symb;
+Elf64_Rela rela;
+int indice_tab_symb = -1;
+int table_rela[50];
+int indice_tab_rela = 0;
 char *sec_names = NULL;
+char *symb_names = NULL;
 void load_data(FILE *file)
 {
     if (file)
@@ -904,7 +910,7 @@ void dump_sections(FILE *file, int i)
     fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
     fread(&section, 1, sizeof(section), file);
     printf("\n--- NEW SECTION ---\n");
-    printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
+    printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%lx\n", i, sec_names + section.sh_name, section.sh_size);
     printf("Type:\t");
     switch (section.sh_type)
     {
@@ -916,12 +922,15 @@ void dump_sections(FILE *file, int i)
         break;
     case 0x2:
         printf("SYMTAB");
+        indice_tab_symb = i;
         break;
     case 0x3:
         printf("STRTAB");
         break;
     case 0x4:
         printf("RELA");
+        table_rela[indice_tab_rela] = i;
+        indice_tab_rela = indice_tab_rela + 1;
         break;
     case 0x5:
         printf("HASH");
@@ -947,7 +956,7 @@ void dump_sections(FILE *file, int i)
         break;
     }
     printf("\n");
-    printf("Properties (flag %x) : ", section.sh_flags);
+    printf("Properties (flag %lx) : ", section.sh_flags);
     //Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#Section_header
     if (section.sh_flags & SHF_WRITE)
         printf("W");
@@ -972,7 +981,7 @@ void dump_sections(FILE *file, int i)
     if (section.sh_flags & SHF_EXCLUDE)
         printf("E");
     printf("\n");
-    printf("Position of section (en octets) :\t%o\n", section.sh_offset);
+    printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
     dump_sections(file, i + 1);
 }
 void etape2(FILE *f)
@@ -992,7 +1001,7 @@ void etape3(FILE *f, int x)
     // Process every byte in the data of the section.
     while (i < section.sh_size)
     {
-        printf("\n0x%08x ", section.sh_addr + i);
+        printf("\n0x%08lx ", section.sh_addr + i);
         for (size_t j = 0; j < HEXA; j++)
         {
             for (size_t k = 0; k < DWORD; k++)
@@ -1024,12 +1033,35 @@ void etape3(FILE *f, int x)
 
     printf("\n");
 }
+
+void etape4(FILE *file){
+  fseek(file, header.e_shoff + indice_tab_symb * sizeof(section), SEEK_SET); //on va a la section de la table des symboles
+  fread(&section, 1, sizeof(section), file);
+  int count = section.sh_size / section.sh_entsize; //nombre d'entree dans la table des symboles
+  for (int i = 0; i < count; i++){
+    //TODO fseek(.....);
+    //TODO fread(....);
+    printf("Num : %d  ", i);
+  }
+}
+
+void etape5(FILE *file){
+  int count = 0;
+  for (int i = 0; i < indice_tab_rela; i++ ){
+    fseek(file, header.e_shoff + table_rela[i] * sizeof(section), SEEK_SET);
+    fread(&section, 1, sizeof(section), file);
+    count = section.sh_size / section.sh_entsize;
+  }
+}
+
 int main(int argc, char *argv[])
 {
     FILE *file = fopen(argv[1], "rb");
     etape1(file);
     etape2(file);
-    etape3(file, 5);
+    etape3(file, 5); //TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
+    etape4(file);
+    etape5(file);
     fclose(file);
     return 0;
 }
