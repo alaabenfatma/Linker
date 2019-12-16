@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <elf.h>
+
+#define HEXA 16
+#define DWORD 4
+#define WORD 2
+#define HWORD 1
+
 void dump_sections(FILE *file, int i);
 void load_data(FILE *file);
 void get_section_names(FILE *file);

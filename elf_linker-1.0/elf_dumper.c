@@ -949,27 +949,27 @@ void dump_sections(FILE *file, int i)
     printf("\n");
     printf("Properties (flag %x) : ", section.sh_flags);
     //Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#Section_header
-    if(section.sh_flags & SHF_WRITE)
+    if (section.sh_flags & SHF_WRITE)
         printf("W");
-    if(section.sh_flags & SHF_ALLOC)
+    if (section.sh_flags & SHF_ALLOC)
         printf("A");
-    if(section.sh_flags & SHF_EXECINSTR)
+    if (section.sh_flags & SHF_EXECINSTR)
         printf("X");
-    if(section.sh_flags & SHF_MERGE)
+    if (section.sh_flags & SHF_MERGE)
         printf("M");
-    if(section.sh_flags & SHF_STRINGS)
+    if (section.sh_flags & SHF_STRINGS)
         printf("S");
-    if(section.sh_flags & SHF_INFO_LINK )
+    if (section.sh_flags & SHF_INFO_LINK)
         printf("I");
-    if(section.sh_flags & SHF_LINK_ORDER)
+    if (section.sh_flags & SHF_LINK_ORDER)
         printf("L");
-    if(section.sh_flags & SHF_OS_NONCONFORMING)
+    if (section.sh_flags & SHF_OS_NONCONFORMING)
         printf("O");
-    if(section.sh_flags & SHF_GROUP )
+    if (section.sh_flags & SHF_GROUP)
         printf("G");
-    if(section.sh_flags & SHF_TLS)
+    if (section.sh_flags & SHF_TLS)
         printf("T");
-    if(section.sh_flags & SHF_EXCLUDE)
+    if (section.sh_flags & SHF_EXCLUDE)
         printf("E");
     printf("\n");
     printf("Position of section (en octets) :\t%o\n", section.sh_offset);
@@ -980,30 +980,56 @@ void etape2(FILE *f)
     get_section_names(f);
     dump_sections(f, 0);
 }
-void etape3(FILE *f,int x)
+void etape3(FILE *f, int x)
 {
-    char ch;
-    int i;
+    int i = 0;
     fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
     fread(&section, 1, sizeof(section), f);
-    const unsigned char *pc = &section.sh_addralign;
-    unsigned char buff[17];
+    unsigned char *buff = malloc(sizeof(unsigned char));
+    unsigned char ASCII_DUMP[HEXA];
     //TODO: Show section name:
-    // Process every byte in the data.
-    printf("0x%08x\n",section.sh_name);
-    printf("%s",sec_names + section.sh_name);
-    for (size_t i = 0; i < section.sh_size; i++)
+    printf("\nHex dump of section '%s':", sec_names + section.sh_name);
+    // Process every byte in the data of the section.
+    while (i < section.sh_size)
     {
-        printf("%c",pc[i]);
+        printf("\n0x%08x ", section.sh_addr + i);
+        for (size_t j = 0; j < HEXA; j++)
+        {
+            for (size_t k = 0; k < DWORD; k++)
+            {
+                if (i < section.sh_size)
+                {
+                    //TODO: faire diff avec readelf -x 5 foo.o
+                    //pour voir que ce code ne donne pas un bonn
+                    //resultat. probleme de lecture d BUFFER
+                    fread(buff, sizeof(*buff), 1, f);
+                    printf("%02x", *buff);
+                    ASCII_DUMP[i % HEXA] = *buff;
+                    i += 1;
+                    continue;
+                }
+                printf(" ");
+            }
+
+            printf(" ");
+        }
+        for (int i = 0; i < sizeof(ASCII_DUMP); i++)
+        {
+            if (ASCII_DUMP[i] >= 33 && ASCII_DUMP[i] <= 255)
+                printf("%c", ASCII_DUMP[i]);
+            else
+                printf(".");
+        }
     }
-    
+
+    printf("\n");
 }
 int main(int argc, char *argv[])
 {
     FILE *file = fopen(argv[1], "rb");
     etape1(file);
     etape2(file);
-    etape3(file,5);
+    etape3(file, 5);
     fclose(file);
     return 0;
 }
