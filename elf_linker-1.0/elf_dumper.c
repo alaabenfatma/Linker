@@ -992,16 +992,18 @@ void etape2(FILE *f)
 void etape3(FILE *f, int x)
 {
     int i = 0;
-    fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
+    printf("Current stuff : %d %d %d",header.e_shoff, x , sizeof(section));
+    fseek(f, header.e_shoff + x * sizeof(section) , SEEK_SET);
     fread(&section, 1, sizeof(section), f);
     unsigned char *buff = malloc(sizeof(unsigned char));
     unsigned char ASCII_DUMP[HEXA];
     //TODO: Show section name:
-    printf("\nHex dump of section '%s':", sec_names + section.sh_name);
+    printf("\nHex dump of section '%s':\n", sec_names + section.sh_name);
+
     // Process every byte in the data of the section.
     while (i < section.sh_size)
     {
-        printf("\n0x%08lx ", section.sh_addr + i);
+        fseek(f, section.sh_offset, SEEK_SET);
         for (size_t j = 0; j < HEXA; j++)
         {
             for (size_t k = 0; k < DWORD; k++)
@@ -1014,7 +1016,8 @@ void etape3(FILE *f, int x)
                     fread(buff, sizeof(*buff), 1, f);
                     printf("%02x", *buff);
                     ASCII_DUMP[i % HEXA] = *buff;
-                    i += 1;
+                    //cool looking stuff
+                    i -=- 1;
                     continue;
                 }
                 printf(" ");
@@ -1022,7 +1025,7 @@ void etape3(FILE *f, int x)
 
             printf(" ");
         }
-        for (int i = 0; i < sizeof(ASCII_DUMP); i++)
+        for (int i = 0; i < sizeof(buff); i++)
         {
             if (ASCII_DUMP[i] >= 33 && ASCII_DUMP[i] <= 255)
                 printf("%c", ASCII_DUMP[i]);
