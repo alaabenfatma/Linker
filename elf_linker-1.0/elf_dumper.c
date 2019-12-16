@@ -1037,11 +1037,21 @@ void etape3(FILE *f, int x)
 void etape4(FILE *file){
   fseek(file, header.e_shoff + indice_tab_symb * sizeof(section), SEEK_SET); //on va a la section de la table des symboles
   fread(&section, 1, sizeof(section), file);
+  printf("Name : %s\n",sec_names + section.sh_name);
   int count = section.sh_size / section.sh_entsize; //nombre d'entree dans la table des symboles
+  fseek(file, section.sh_offset, SEEK_SET);
   for (int i = 0; i < count; i++){
-    //TODO fseek(.....);
-    //TODO fread(....);
+    fread(&symb, 1, sizeof(symb), file);
     printf("Num : %d  ", i);
+    printf("Valeur : %x  ", symb.st_value);
+    printf("Taille : %d  ", symb.st_size);
+    printf("Type : %x  ", symb.st_info);
+    printf("Vis : %x  ", symb.st_other);
+    printf("Index : %x  ", symb.st_shndx);
+    printf("Nom : %x\n", symb.st_name);
+
+
+
   }
 }
 
@@ -1051,6 +1061,15 @@ void etape5(FILE *file){
     fseek(file, header.e_shoff + table_rela[i] * sizeof(section), SEEK_SET);
     fread(&section, 1, sizeof(section), file);
     count = section.sh_size / section.sh_entsize;
+    printf("Section de redressage numéro : %d\n", table_rela[i]);
+    fseek(file, section.sh_offset, SEEK_SET);
+    for (int j =0; j < count; j++){
+      fread(&rela,1,sizeof(rela),file);
+      printf("Decalage : %x  ", rela.r_offset);
+      printf("Type : %x  ", ELF64_R_TYPE(rela.r_info));
+      printf("Index : %x\n", ELF64_R_SYM(rela.r_info));
+
+    }
   }
 }
 
