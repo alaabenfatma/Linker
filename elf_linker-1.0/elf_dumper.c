@@ -1071,9 +1071,9 @@ void etape4(FILE *file)
    for (int i = 0; i < count; i++)
    {
       fread(&symb, 1, sizeof(symb), file);
-      printf("Num : %d  ", i);
-      printf("Valeur : %x  ", symb.st_value);
-      printf("Taille : %d  ", symb.st_size);
+      printf("Num : %d  \t", i);
+      printf("Valeur : %x  \t", symb.st_value);
+      printf("Taille : %d  \t", symb.st_size);
       //printf("Type : %x  ", symb.st_info);
       switch (symb.st_info){
             case STT_NOTYPE:  printf("Type : NOTYPE\t");break;
@@ -1088,23 +1088,25 @@ void etape4(FILE *file)
             case STT_HIOS:	printf("Type : HIOS\t");break;	/* End of OS-specific */
             case STT_LOPROC:	printf("Type : LOPROC\t");break;		/* Start of processor-specific */
             case STT_HIPROC:	printf("Type : HIPROC\t");break;		/* End of processor-specific */
-            default :  printf("Type : NOTYPE\t");break;
+            default :  printf("Type : NOTYPE\t");break;  ///problème ici!!!!
             
       }
 
+
       //printf("symb.st_info = %i", symb.st_info);
       //printf("Vis : %x  ", symb.st_other);
+      
       switch(symb.st_other){
             case STV_DEFAULT :	printf("Vis : DEFAULT\t");break;		/* Default symbol visibility rules */
             case STV_INTERNAL	:     printf("Vis : INTERNAL\t");break;		/* Processor specific hidden class */
-            case STV_HIDDEN	: 	printf("Vis : HIDDEN\t");break;	/* Sym unavailable in other modules */
-            case STV_PROTECTED : 	printf("Vis : PROTECTED\t");break;	/* Not preemptible, not exported */
+            case STV_HIDDEN	: 	printf("Vis : HIDDEN\t");break;	      /* Sym unavailable in other modules */
+            case STV_PROTECTED : 	printf("Vis : PROTECTED\t");break;	      /* Not preemptible, not exported */
       }
       //printf("Index : %x  ", symb.st_shndx);
       switch(symb.st_shndx){
-            case SHN_UNDEF:		printf("Ndx : UND\t");break;	/* Undefined section */
+            case SHN_UNDEF:		printf("Ndx : UND\t");break;	      /* Undefined section */
             //case SHN_LORESERVE:	printf("Ndx : LORESERVE\t");break;	/* Start of reserved indices */
-            //case SHN_LOPROC:		printf("Ndx : LOPROC\t");break;	/* Start of processor-specific */
+            //case SHN_LOPROC:      printf("Ndx : LOPROC\t");break;	/* Start of processor-specific */
             case SHN_BEFORE:		printf("Ndx : BEFORE\t");break;	/* Order section before all others (Solaris).  */
             case SHN_AFTER:		printf("Ndx : AFTER\t");break;	/* Order section after all others (Solaris).  */
             case SHN_HIPROC:		printf("Ndx : HIPROC\t");break;	/* End of processor-specific */
@@ -1112,11 +1114,55 @@ void etape4(FILE *file)
             case SHN_HIOS:    	printf("Ndx : HIOS\t");break;	      /* End of OS-specific */
             case SHN_ABS:		printf("Ndx : ABS\t");break;		/* Associated symbol is absolute */
             case SHN_COMMON:		printf("Ndx : COMMON\t");break;	/* Associated symbol is common */
-            //case SHN_XINDEX:	      printf("Ndx : XINDEX\t");break;	/* Index is in extra table.  */
+            //case SHN_XINDEX:	printf("Ndx : XINDEX\t");break;	/* Index is in extra table.  */
             case SHN_HIRESERVE:	printf("Ndx : HIRESERVE\t");break;	/* End of reserved indices */
-
+            default : 
+                  if(symb.st_shndx<10){
+                        printf("Ndx : %d\t\t", symb.st_shndx); break;
+                  } else {
+                        printf("Ndx : %d\t", symb.st_shndx); break;}
       }
-      printf("Nom : %x\n", symb.st_name);
+     // printf("Nom : %x\n", symb.st_name);
+      switch (symb.st_name){
+            case SHT_NULL:          printf("Nom : \n", symb.st_name);break;   /* Section header table entry unused */
+            case SHT_PROGBITS: 	printf("Nom : %x\n", symb.st_name);break;	/* Program data */
+            case SHT_SYMTAB: 		printf("Nom : %x\n", symb.st_name);break; /* Symbol table */
+            case SHT_STRTAB:	  	printf("Nom : %x\n", symb.st_name);break;	/* String table */
+            case SHT_RELA:	  	printf("Nom : %x\n", symb.st_name);break;	/* Relocation entries with addends */
+            case SHT_HASH:	  	printf("Nom : %x\n", symb.st_name);break;	/* Symbol hash table */
+            case SHT_DYNAMIC:	  	printf("Nom : %x\n", symb.st_name);break; /* Dynamic linking information */
+            case SHT_NOTE:	  	printf("Nom : %x\n", symb.st_name);break;	/* Notes */
+            case SHT_NOBITS:	  	printf("Nom : %x\n", symb.st_name);break;	/* Program space with no data (bss) */
+            case SHT_REL:		printf("Nom : %x\n", symb.st_name);break;	/* Relocation entries, no addends */
+            case SHT_SHLIB:	  	printf("Nom : %x\n", symb.st_name);break;	/* Reserved */
+            case SHT_DYNSYM:	  	printf("Nom : %x\n", symb.st_name);break;	/* Dynamic linker symbol table */
+            case SHT_INIT_ARRAY:	printf("Nom : %x\n", symb.st_name);break; /* Array of constructors */
+            case SHT_FINI_ARRAY:	printf("Nom : %x\n", symb.st_name);break;	/* Array of destructors */
+            case SHT_PREINIT_ARRAY: printf("Nom : %x\n", symb.st_name);break;	/* Array of pre-constructors */
+            case SHT_GROUP:	      printf("Nom : %x\n", symb.st_name);break; /* Section group */
+            case SHT_SYMTAB_SHNDX: 	printf("Nom : %x\n", symb.st_name);break;	/* Extended section indeces */
+            case SHT_NUM:		printf("Nom : %x\n", symb.st_name);break; /* Number of defined types.  */
+            case SHT_LOOS:	  	printf("Nom : %x\n", symb.st_name);break; /* Start OS-specific.  */
+            case SHT_GNU_ATTRIBUTES:printf("Nom : %x\n", symb.st_name);break; /* Object attributes.  */
+            case SHT_GNU_HASH:	printf("Nom : %x\n", symb.st_name);break; /* GNU-style hash table.  */
+            case SHT_GNU_LIBLIST:	printf("Nom : %x\n", symb.st_name);break;	/* Prelink library list */
+            case SHT_CHECKSUM:	printf("Nom : %x\n", symb.st_name);break;	/* Checksum for DSO content.  */
+            case SHT_LOSUNW:	  	printf("Nom : %x\n", symb.st_name);break; /* Sun-specific low bound.  */
+            //case SHT_SUNW_move:	printf("Nom : %x\n", symb.st_name);break;
+            case SHT_SUNW_COMDAT:   printf("Nom : %x\n", symb.st_name);break;
+            case SHT_SUNW_syminfo:  printf("Nom : %x\n", symb.st_name);break;
+            case SHT_GNU_verdef:	printf("Nom : %x\n", symb.st_name);break;	/* Version definition section.  */
+            case SHT_GNU_verneed:	printf("Nom : %x\n", symb.st_name);break;	/* Version needs section.  */
+            case SHT_GNU_versym:	printf("Nom : %x\n", symb.st_name);break;	/* Version symbol table.  */
+            //case SHT_HISUNW:	0x6fffffff	/* Sun-specific high bound.  */
+            //case SHT_HIOS:	  	printf("Nom : %x\n", symb.st_name);break; /* End OS-specific type */
+            case SHT_LOPROC:	  	printf("Nom : %x\n", symb.st_name);break; /* Start of processor-specific */
+            case SHT_HIPROC:	  	printf("Nom : %x\n", symb.st_name);break; /* End of processor-specific */
+            case SHT_LOUSER:	  	printf("Nom : %x\n", symb.st_name);break; /* Start of application-specific */
+            case SHT_HIUSER:	      printf("Nom : %x\n", symb.st_name);break; /* End of application-specific */
+
+            default : printf("Nom : %x\n", symb.st_name);break;
+      }
    }
 }
 
@@ -1133,7 +1179,7 @@ void etape5(FILE *file)
       for (int j = 0; j < count; j++)
       {
          fread(&rela, 1, sizeof(rela), file);
-         printf("Decalage : %x  ", rela.r_offset);
+         printf("Decalage : %llx  ", rela.r_offset);
          printf("Type : %x  ", ELF64_R_TYPE(rela.r_info));
          printf("Index : %x\n", ELF64_R_SYM(rela.r_info));
       }
