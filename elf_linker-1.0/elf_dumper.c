@@ -1074,9 +1074,48 @@ void etape4(FILE *file)
       printf("Num : %d  ", i);
       printf("Valeur : %x  ", symb.st_value);
       printf("Taille : %d  ", symb.st_size);
-      printf("Type : %x  ", symb.st_info);
-      printf("Vis : %x  ", symb.st_other);
-      printf("Index : %x  ", symb.st_shndx);
+      //printf("Type : %x  ", symb.st_info);
+      switch (symb.st_info){
+            case STT_NOTYPE:  printf("Type : NOTYPE\t");break;
+            case STT_OBJECT:	printf("Type : OBJECT\t");break;		/* Symbol is a data object */
+            case STT_FUNC:	printf("Type : FUNC\t");break;	/* Symbol is a code object */
+            case STT_SECTION:	printf("Type : SECTION\t");break;	/* Symbol associated with a section */
+            case STT_FILE:	printf("Type : FILE\t");break;		/* Symbol's name is file name */
+            case STT_COMMON:	printf("Type : COMMON\t");break;	/* Symbol is a common data object */
+            case STT_TLS:	printf("Type : TLS\t");break;		/* Symbol is thread-local data object*/
+            case STT_NUM:	printf("Type : NUM\t");break;		/* Number of defined types.  */
+            case STT_LOOS:	printf("Type : LOOS\t");break;	/* Start of OS-specific */
+            case STT_HIOS:	printf("Type : HIOS\t");break;	/* End of OS-specific */
+            case STT_LOPROC:	printf("Type : LOPROC\t");break;		/* Start of processor-specific */
+            case STT_HIPROC:	printf("Type : HIPROC\t");break;		/* End of processor-specific */
+            default :  printf("Type : NOTYPE\t");break;
+            
+      }
+
+      //printf("symb.st_info = %i", symb.st_info);
+      //printf("Vis : %x  ", symb.st_other);
+      switch(symb.st_other){
+            case STV_DEFAULT :	printf("Vis : DEFAULT\t");break;		/* Default symbol visibility rules */
+            case STV_INTERNAL	:     printf("Vis : INTERNAL\t");break;		/* Processor specific hidden class */
+            case STV_HIDDEN	: 	printf("Vis : HIDDEN\t");break;	/* Sym unavailable in other modules */
+            case STV_PROTECTED : 	printf("Vis : PROTECTED\t");break;	/* Not preemptible, not exported */
+      }
+      //printf("Index : %x  ", symb.st_shndx);
+      switch(symb.st_shndx){
+            case SHN_UNDEF:		printf("Ndx : UND\t");break;	/* Undefined section */
+            //case SHN_LORESERVE:	printf("Ndx : LORESERVE\t");break;	/* Start of reserved indices */
+            //case SHN_LOPROC:		printf("Ndx : LOPROC\t");break;	/* Start of processor-specific */
+            case SHN_BEFORE:		printf("Ndx : BEFORE\t");break;	/* Order section before all others (Solaris).  */
+            case SHN_AFTER:		printf("Ndx : AFTER\t");break;	/* Order section after all others (Solaris).  */
+            case SHN_HIPROC:		printf("Ndx : HIPROC\t");break;	/* End of processor-specific */
+            case SHN_LOOS:		printf("Ndx : LOOS\t");break;	      /* Start of OS-specific */
+            case SHN_HIOS:    	printf("Ndx : HIOS\t");break;	      /* End of OS-specific */
+            case SHN_ABS:		printf("Ndx : ABS\t");break;		/* Associated symbol is absolute */
+            case SHN_COMMON:		printf("Ndx : COMMON\t");break;	/* Associated symbol is common */
+            //case SHN_XINDEX:	      printf("Ndx : XINDEX\t");break;	/* Index is in extra table.  */
+            case SHN_HIRESERVE:	printf("Ndx : HIRESERVE\t");break;	/* End of reserved indices */
+
+      }
       printf("Nom : %x\n", symb.st_name);
    }
 }
@@ -1106,11 +1145,11 @@ int main(int argc, char *argv[])
    FILE *file = fopen(argv[1], "rb");
    etape1(file);
    etape2(file);
-   int x = 0;
-   scanf("%d", &x);
-   etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
-   /*etape4(file);
-   etape5(file); */
+   //int x = 0;
+   //scanf("%d", &x);
+   //etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
+   etape4(file);
+   //etape5(file); 
    fclose(file);
    return 0;
 }
