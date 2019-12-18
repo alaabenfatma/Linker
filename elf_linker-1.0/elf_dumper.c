@@ -1057,6 +1057,7 @@ void etape3(FILE *f, int x)
 
    fseek(f, header.e_shoff + x* sizeof(section), SEEK_SET);
    fread(&section, 1, sizeof(section), f);
+   section_to_little_endian();
    unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
   	//TODO: Show section name:
@@ -1223,9 +1224,9 @@ int main(int argc, char *argv[])
    FILE *file = fopen(argv[1], "rb");
    etape1(file);
    etape2(file);
-   //int x = 0;
-   //scanf("%d", &x);
-   //etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
+   int x = 0;
+   scanf("%d", &x);
+   etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
    etape4(file);
    etape5(file);
    fclose(file);
