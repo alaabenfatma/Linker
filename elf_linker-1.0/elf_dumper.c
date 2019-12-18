@@ -1,10 +1,11 @@
 #include "brain.h"
 
 //local header
-Elf32_Ehdr header; 
+Elf32_Ehdr header;
 Elf32_Shdr section;
-Elf64_Sym symb;
-Elf64_Rela rela;
+Elf32_Sym symb;
+Elf32_Rela rela;
+Elf32_Rel rel;
 int indice_tab_symb = -1;
 int table_rela[50];
 int indice_tab_rela = 0;
@@ -27,7 +28,7 @@ void header_to_little_endian()
       header.e_type = reverse_2(header.e_type);
       header.e_version = reverse_4(header.e_version);
       header.e_entry = reverse_4(header.e_entry);}
-} 
+}
 void section_to_little_endian(){
    if(ENDIAN==1){
    section.sh_name = reverse_4(section.sh_name);
@@ -41,6 +42,30 @@ void section_to_little_endian(){
    section.sh_addralign = reverse_4(section.sh_addralign);
    section.sh_entsize = reverse_4(section.sh_entsize);}
 }
+
+void symbol_to_little_endian(){
+   if(ENDIAN==1){
+   symb.st_name = reverse_4(symb.st_name);
+   symb.st_value = reverse_4(symb.st_value);
+   symb.st_size = reverse_4(symb.st_size);
+   symb.st_info = reverse_4(symb.st_info);
+   symb.st_other = reverse_4(symb.st_other);
+   symb.st_shndx = reverse_4(symb.st_shndx);}
+}
+
+void rela_to_little_endian(){
+   if(ENDIAN==1){
+   rela.r_offset = reverse_4(rela.r_offset);
+   rela.r_info = reverse_4(rela.r_info);
+   rela.r_addend = reverse_4(rela.r_addend);}
+}
+
+void rel_to_little_endian(){
+   if(ENDIAN==1){
+   rel.r_offset = reverse_4(rel.r_offset);
+   rel.r_info = reverse_4(rel.r_info);}
+}
+
 void load_data(FILE *file)
 {
    if (file)
@@ -920,9 +945,6 @@ void get_section_names(FILE *file)
 void etape1(FILE *f)
 {
    load_data(f);
-   get_magic();
-   get_class();
-   get_donnees();
    get_e_version();
    get_os();
    get_ABI();
@@ -985,6 +1007,8 @@ void dump_sections(FILE *file, int i)
          break;
       case 0x9:
          printf("REL");
+         table_rela[indice_tab_rela] = i;
+         indice_tab_rela = indice_tab_rela + 1;
          break;
       case 0x0A:
          printf("SHLIB");
@@ -1104,12 +1128,14 @@ void etape4(FILE *file)
 {
    fseek(file, header.e_shoff + indice_tab_symb* sizeof(section), SEEK_SET);	//on va a la section de la table des symboles
    fread(&section, 1, sizeof(section), file);
+   section_to_little_endian();
    int count = section.sh_size / section.sh_entsize;	//nombre d'entree dans la table des symboles
+   printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb, count);
    fseek(file, section.sh_offset, SEEK_SET);
-  printf("\nTable des symboles %d à %d entrées: \n", indice_tab_symb, count);
    for (int i = 0; i < count; i++)
    {
       fread(&symb, 1, sizeof(symb), file);
+      symbol_to_little_endian();
       printf("Num: %d |", i);
       printf("Valeur: %x |", symb.st_value);
       printf("Taille: %d |", symb.st_size);
@@ -1141,7 +1167,7 @@ void etape4(FILE *file)
             case STV_HIDDEN	: 	printf("Vis: HIDDEN |");break;	      /* Sym unavailable in other modules */
             case STV_PROTECTED : 	printf("Vis: PROTECTED |");break;	      /* Not preemptible, not exported */
       }
-      //printf("Index : %x  ", symb.st_shndx);
+      //printf("Index: %x |", symb.st_shndx);
       switch(symb.st_shndx){
             case SHN_UNDEF:		printf("Ndx: UND |");break;	      /* Undefined section */
             //case SHN_LORESERVE:	printf("Ndx : LORESERVE |");break;	/* Start of reserved indices */
@@ -1155,13 +1181,9 @@ void etape4(FILE *file)
             case SHN_COMMON:		printf("Ndx: COMMON |");break;	/* Associated symbol is common */
             //case SHN_XINDEX:	printf("Ndx : XINDEX |");break;	/* Index is in extra table.  */
             case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;	/* End of reserved indices */
-            default :
-                  if(symb.st_shndx<10){
-                        printf("Ndx: %d |", symb.st_shndx); break;
-                  } else {
-                        printf("Ndx: %d |", symb.st_shndx); break;}
+            default : printf("Ndx: %d |", symb.st_shndx); break;
       }
-     printf("Nom: %x\n", symb.st_name);
+      printf("Nom: %x\n", symb.st_name);
    }
 }
 
@@ -1172,15 +1194,26 @@ void etape5(FILE *file)
    {
       fseek(file, header.e_shoff + table_rela[i] *sizeof(section), SEEK_SET);
       fread(&section, 1, sizeof(section), file);
+      section_to_little_endian();
       count = section.sh_size / section.sh_entsize;
-      printf("\nSection de redressage numéro %d à %d entrée(s): \n", table_rela[i], count);
+      printf("Section de redressage numéro : %d\n", table_rela[i]);
       fseek(file, section.sh_offset, SEEK_SET);
       for (int j = 0; j < count; j++)
       {
-         fread(&rela, 1, sizeof(rela), file);
-         printf("Decalage : %llx |", rela.r_offset);
-         printf("Type : %x |", ELF64_R_TYPE(rela.r_info));
-         printf("Index : %x\n", ELF64_R_SYM(rela.r_info));
+         if(section.sh_type == 4){
+           fread(&rela, 1, sizeof(rela), file);
+           rela_to_little_endian();
+           printf("Decalage: %llx |", rela.r_offset);
+           printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
+           printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
+         }
+         if(section.sh_type == 9){
+           fread(&rel, 1, sizeof(rel), file);
+           rel_to_little_endian();
+           printf("Decalage: %llx |", rel.r_offset);
+           printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
+         }
+
       }
    }
 }
@@ -1194,7 +1227,7 @@ int main(int argc, char *argv[])
    //scanf("%d", &x);
    //etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
    etape4(file);
-   //etape5(file); 
+   etape5(file);
    fclose(file);
    return 0;
 }
