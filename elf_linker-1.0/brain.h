@@ -3,11 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
+#include <byteswap.h>
+#include "util.h"
 
 #define HEXA 16
 #define DWORD 4
 #define WORD 2
 #define HWORD 1
+//#undef htonl
+//#undef ntohl
+#define bswap_16(x) ((unsigned int)__builtin_bswap16(x))
+#define bswap_32(x) ((unsigned int)__builtin_bswap32(x))
+#define bswap_64(x) ((unsigned int)__builtin_bswap64(x))
+int ENDIAN = 0; //var globale => 0 = little | 1 = bug
 
 void dump_sections(FILE *file, int i);
 void load_data(FILE *file);

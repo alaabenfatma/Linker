@@ -1,3 +1,6 @@
+###########################################
+Tests=("foo.o" "/bin/ls" "checker.sh" "Examples_loader/example1.o")
+###########################################
 affiche_etape(){
     echo "Choisir une Etape à vérifier: "
     echo "  1 - Etape 1"
@@ -9,7 +12,6 @@ affiche_etape(){
     echo "Etape à vérifier:"
 }
 etape1(){
-    Tests=("foo.o" "/bin/ls" "checker.sh")
     for f in "${Tests[@]}"; do
         echo "*******************************************"
         echo "Testing the file : $f"
@@ -31,7 +33,18 @@ etape1(){
     done
 }
 etape2(){
-    echo "etape2"
+    Numéro=0
+    echo "*******************************************"
+    first=$(readelf -S foo.o | cut -d"]" -f1 | cut -d"[" -f2 | sed '1,5d' | cut -d' ' -f2 | sed  '/^des/d' | tr -d "\n\t" )
+    second=$(./elf_dumper foo.o | egrep "Numéro" | cut -d":" -f2 | tr -d "\n\t ")
+    #echo "$first"
+    #echo "*******************************************"
+    #echo "$second"
+    if [[ $first == $second ]] ; then
+            echo "GOOD TEST"
+    else
+            echo "WRONG TEST"
+    fi
 }
 etape3(){
     echo "etape3"
