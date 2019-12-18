@@ -45,12 +45,14 @@ void section_to_little_endian(){
 
 void symbol_to_little_endian(){
    if(ENDIAN==1){
-   symb.st_name = reverse_4(symb.st_name);
-   symb.st_value = reverse_4(symb.st_value);
-   symb.st_size = reverse_4(symb.st_size);
+   symb.st_name = reverse_2(symb.st_name);
+   symb.st_value = reverse_2(symb.st_value);
+   symb.st_size = reverse_2(symb.st_size);
+   /*
+   These are already in unsigned char, can't be swapped.
    symb.st_info = reverse_4(symb.st_info);
-   symb.st_other = reverse_4(symb.st_other);
-   symb.st_shndx = reverse_4(symb.st_shndx);}
+   symb.st_other = reverse_4(symb.st_other);*/
+   symb.st_shndx = reverse_2(symb.st_shndx);}
 }
 
 void rela_to_little_endian(){
