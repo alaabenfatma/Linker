@@ -1104,104 +1104,64 @@ void etape4(FILE *file)
 {
    fseek(file, header.e_shoff + indice_tab_symb* sizeof(section), SEEK_SET);	//on va a la section de la table des symboles
    fread(&section, 1, sizeof(section), file);
-   printf("Name : %s\n", sec_names + section.sh_name);
    int count = section.sh_size / section.sh_entsize;	//nombre d'entree dans la table des symboles
    fseek(file, section.sh_offset, SEEK_SET);
+  printf("\nTable des symboles %d à %d entrées: \n", indice_tab_symb, count);
    for (int i = 0; i < count; i++)
    {
       fread(&symb, 1, sizeof(symb), file);
-      printf("Num : %d  \t", i);
-      printf("Valeur : %x  \t", symb.st_value);
-      printf("Taille : %d  \t", symb.st_size);
+      printf("Num: %d |", i);
+      printf("Valeur: %x |", symb.st_value);
+      printf("Taille: %d |", symb.st_size);
       //printf("Type : %x  ", symb.st_info);
       switch (symb.st_info){
-            case STT_NOTYPE:  printf("Type : NOTYPE\t");break;
-            case STT_OBJECT:	printf("Type : OBJECT\t");break;		/* Symbol is a data object */
-            case STT_FUNC:	printf("Type : FUNC\t");break;	/* Symbol is a code object */
-            case STT_SECTION:	printf("Type : SECTION\t");break;	/* Symbol associated with a section */
-            case STT_FILE:	printf("Type : FILE\t");break;		/* Symbol's name is file name */
-            case STT_COMMON:	printf("Type : COMMON\t");break;	/* Symbol is a common data object */
-            case STT_TLS:	printf("Type : TLS\t");break;		/* Symbol is thread-local data object*/
-            case STT_NUM:	printf("Type : NUM\t");break;		/* Number of defined types.  */
-            case STT_LOOS:	printf("Type : LOOS\t");break;	/* Start of OS-specific */
-            case STT_HIOS:	printf("Type : HIOS\t");break;	/* End of OS-specific */
-            case STT_LOPROC:	printf("Type : LOPROC\t");break;		/* Start of processor-specific */
-            case STT_HIPROC:	printf("Type : HIPROC\t");break;		/* End of processor-specific */
-            default :  printf("Type : NOTYPE\t");break;  ///problème ici!!!!
-            
+            case STT_NOTYPE:  printf("Type: NOTYPE |");break;
+            case STT_OBJECT:	printf("Type: OBJECT |");break;		/* Symbol is a data object */
+            case STT_FUNC:	printf("Type: FUNC |");break;	/* Symbol is a code object */
+            case STT_SECTION:	printf("Type: SECTION |");break;	/* Symbol associated with a section */
+            case STT_FILE:	printf("Type: FILE |");break;		/* Symbol's name is file name */
+            case STT_COMMON:	printf("Type: COMMON |");break;	/* Symbol is a common data object */
+            case STT_TLS:	printf("Type: TLS |");break;		/* Symbol is thread-local data object*/
+            case STT_NUM:	printf("Type: NUM |");break;		/* Number of defined types.  */
+            case STT_LOOS:	printf("Type: LOOS |");break;	/* Start of OS-specific */
+            case STT_HIOS:	printf("Type: HIOS |");break;	/* End of OS-specific */
+            case STT_LOPROC:	printf("Type: LOPROC |");break;		/* Start of processor-specific */
+            case STT_HIPROC:	printf("Type: HIPROC |");break;		/* End of processor-specific */
+            default :  printf("Type: NOTYPE |");break;  ///problème ici!!!!
+
       }
 
 
       //printf("symb.st_info = %i", symb.st_info);
       //printf("Vis : %x  ", symb.st_other);
-      
+
       switch(symb.st_other){
-            case STV_DEFAULT :	printf("Vis : DEFAULT\t");break;		/* Default symbol visibility rules */
-            case STV_INTERNAL	:     printf("Vis : INTERNAL\t");break;		/* Processor specific hidden class */
-            case STV_HIDDEN	: 	printf("Vis : HIDDEN\t");break;	      /* Sym unavailable in other modules */
-            case STV_PROTECTED : 	printf("Vis : PROTECTED\t");break;	      /* Not preemptible, not exported */
+            case STV_DEFAULT :	printf("Vis: DEFAULT |");break;		/* Default symbol visibility rules */
+            case STV_INTERNAL	:     printf("Vis: INTERNAL |");break;		/* Processor specific hidden class */
+            case STV_HIDDEN	: 	printf("Vis: HIDDEN |");break;	      /* Sym unavailable in other modules */
+            case STV_PROTECTED : 	printf("Vis: PROTECTED |");break;	      /* Not preemptible, not exported */
       }
       //printf("Index : %x  ", symb.st_shndx);
       switch(symb.st_shndx){
-            case SHN_UNDEF:		printf("Ndx : UND\t");break;	      /* Undefined section */
-            //case SHN_LORESERVE:	printf("Ndx : LORESERVE\t");break;	/* Start of reserved indices */
-            //case SHN_LOPROC:      printf("Ndx : LOPROC\t");break;	/* Start of processor-specific */
-            case SHN_BEFORE:		printf("Ndx : BEFORE\t");break;	/* Order section before all others (Solaris).  */
-            case SHN_AFTER:		printf("Ndx : AFTER\t");break;	/* Order section after all others (Solaris).  */
-            case SHN_HIPROC:		printf("Ndx : HIPROC\t");break;	/* End of processor-specific */
-            case SHN_LOOS:		printf("Ndx : LOOS\t");break;	      /* Start of OS-specific */
-            case SHN_HIOS:    	printf("Ndx : HIOS\t");break;	      /* End of OS-specific */
-            case SHN_ABS:		printf("Ndx : ABS\t");break;		/* Associated symbol is absolute */
-            case SHN_COMMON:		printf("Ndx : COMMON\t");break;	/* Associated symbol is common */
-            //case SHN_XINDEX:	printf("Ndx : XINDEX\t");break;	/* Index is in extra table.  */
-            case SHN_HIRESERVE:	printf("Ndx : HIRESERVE\t");break;	/* End of reserved indices */
-            default : 
+            case SHN_UNDEF:		printf("Ndx: UND |");break;	      /* Undefined section */
+            //case SHN_LORESERVE:	printf("Ndx : LORESERVE |");break;	/* Start of reserved indices */
+            //case SHN_LOPROC:      printf("Ndx : LOPROC |");break;	/* Start of processor-specific */
+            case SHN_BEFORE:		printf("Ndx: BEFORE |");break;	/* Order section before all others (Solaris).  */
+            case SHN_AFTER:		printf("Ndx: AFTER |");break;	/* Order section after all others (Solaris).  */
+            case SHN_HIPROC:		printf("Ndx: HIPROC |");break;	/* End of processor-specific */
+            case SHN_LOOS:		printf("Ndx: LOOS |");break;	      /* Start of OS-specific */
+            case SHN_HIOS:    	printf("Ndx: HIOS |");break;	      /* End of OS-specific */
+            case SHN_ABS:		printf("Ndx: ABS |");break;		/* Associated symbol is absolute */
+            case SHN_COMMON:		printf("Ndx: COMMON |");break;	/* Associated symbol is common */
+            //case SHN_XINDEX:	printf("Ndx : XINDEX |");break;	/* Index is in extra table.  */
+            case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;	/* End of reserved indices */
+            default :
                   if(symb.st_shndx<10){
-                        printf("Ndx : %d\t\t", symb.st_shndx); break;
+                        printf("Ndx: %d |", symb.st_shndx); break;
                   } else {
-                        printf("Ndx : %d\t", symb.st_shndx); break;}
+                        printf("Ndx: %d |", symb.st_shndx); break;}
       }
-     // printf("Nom : %x\n", symb.st_name);
-      switch (symb.st_name){
-            case SHT_NULL:          printf("Nom : \n", symb.st_name);break;   /* Section header table entry unused */
-            case SHT_PROGBITS: 	printf("Nom : %x\n", symb.st_name);break;	/* Program data */
-            case SHT_SYMTAB: 		printf("Nom : %x\n", symb.st_name);break; /* Symbol table */
-            case SHT_STRTAB:	  	printf("Nom : %x\n", symb.st_name);break;	/* String table */
-            case SHT_RELA:	  	printf("Nom : %x\n", symb.st_name);break;	/* Relocation entries with addends */
-            case SHT_HASH:	  	printf("Nom : %x\n", symb.st_name);break;	/* Symbol hash table */
-            case SHT_DYNAMIC:	  	printf("Nom : %x\n", symb.st_name);break; /* Dynamic linking information */
-            case SHT_NOTE:	  	printf("Nom : %x\n", symb.st_name);break;	/* Notes */
-            case SHT_NOBITS:	  	printf("Nom : %x\n", symb.st_name);break;	/* Program space with no data (bss) */
-            case SHT_REL:		printf("Nom : %x\n", symb.st_name);break;	/* Relocation entries, no addends */
-            case SHT_SHLIB:	  	printf("Nom : %x\n", symb.st_name);break;	/* Reserved */
-            case SHT_DYNSYM:	  	printf("Nom : %x\n", symb.st_name);break;	/* Dynamic linker symbol table */
-            case SHT_INIT_ARRAY:	printf("Nom : %x\n", symb.st_name);break; /* Array of constructors */
-            case SHT_FINI_ARRAY:	printf("Nom : %x\n", symb.st_name);break;	/* Array of destructors */
-            case SHT_PREINIT_ARRAY: printf("Nom : %x\n", symb.st_name);break;	/* Array of pre-constructors */
-            case SHT_GROUP:	      printf("Nom : %x\n", symb.st_name);break; /* Section group */
-            case SHT_SYMTAB_SHNDX: 	printf("Nom : %x\n", symb.st_name);break;	/* Extended section indeces */
-            case SHT_NUM:		printf("Nom : %x\n", symb.st_name);break; /* Number of defined types.  */
-            case SHT_LOOS:	  	printf("Nom : %x\n", symb.st_name);break; /* Start OS-specific.  */
-            case SHT_GNU_ATTRIBUTES:printf("Nom : %x\n", symb.st_name);break; /* Object attributes.  */
-            case SHT_GNU_HASH:	printf("Nom : %x\n", symb.st_name);break; /* GNU-style hash table.  */
-            case SHT_GNU_LIBLIST:	printf("Nom : %x\n", symb.st_name);break;	/* Prelink library list */
-            case SHT_CHECKSUM:	printf("Nom : %x\n", symb.st_name);break;	/* Checksum for DSO content.  */
-            case SHT_LOSUNW:	  	printf("Nom : %x\n", symb.st_name);break; /* Sun-specific low bound.  */
-            //case SHT_SUNW_move:	printf("Nom : %x\n", symb.st_name);break;
-            case SHT_SUNW_COMDAT:   printf("Nom : %x\n", symb.st_name);break;
-            case SHT_SUNW_syminfo:  printf("Nom : %x\n", symb.st_name);break;
-            case SHT_GNU_verdef:	printf("Nom : %x\n", symb.st_name);break;	/* Version definition section.  */
-            case SHT_GNU_verneed:	printf("Nom : %x\n", symb.st_name);break;	/* Version needs section.  */
-            case SHT_GNU_versym:	printf("Nom : %x\n", symb.st_name);break;	/* Version symbol table.  */
-            //case SHT_HISUNW:	0x6fffffff	/* Sun-specific high bound.  */
-            //case SHT_HIOS:	  	printf("Nom : %x\n", symb.st_name);break; /* End OS-specific type */
-            case SHT_LOPROC:	  	printf("Nom : %x\n", symb.st_name);break; /* Start of processor-specific */
-            case SHT_HIPROC:	  	printf("Nom : %x\n", symb.st_name);break; /* End of processor-specific */
-            case SHT_LOUSER:	  	printf("Nom : %x\n", symb.st_name);break; /* Start of application-specific */
-            case SHT_HIUSER:	      printf("Nom : %x\n", symb.st_name);break; /* End of application-specific */
-
-            default : printf("Nom : %x\n", symb.st_name);break;
-      }
+     printf("Nom: %x\n", symb.st_name);
    }
 }
 
@@ -1213,13 +1173,13 @@ void etape5(FILE *file)
       fseek(file, header.e_shoff + table_rela[i] *sizeof(section), SEEK_SET);
       fread(&section, 1, sizeof(section), file);
       count = section.sh_size / section.sh_entsize;
-      printf("Section de redressage numéro : %d\n", table_rela[i]);
+      printf("\nSection de redressage numéro %d à %d entrée(s): \n", table_rela[i], count);
       fseek(file, section.sh_offset, SEEK_SET);
       for (int j = 0; j < count; j++)
       {
          fread(&rela, 1, sizeof(rela), file);
-         printf("Decalage : %llx  ", rela.r_offset);
-         printf("Type : %x  ", ELF64_R_TYPE(rela.r_info));
+         printf("Decalage : %llx |", rela.r_offset);
+         printf("Type : %x |", ELF64_R_TYPE(rela.r_info));
          printf("Index : %x\n", ELF64_R_SYM(rela.r_info));
       }
    }
