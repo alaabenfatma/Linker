@@ -10,24 +10,61 @@ int table_rela[50];
 int indice_tab_rela = 0;
 char *sec_names = NULL;
 char *symb_names = NULL;
+
+void header_to_little_endian()
+{
+      if(ENDIAN==1){
+      header.e_flags = reverse_4(header.e_flags);
+      header.e_ehsize = reverse_2(header.e_ehsize);
+      header.e_machine = reverse_2(header.e_machine);
+      header.e_phentsize = reverse_2(header.e_phentsize);
+      header.e_phnum = reverse_2(header.e_phnum);
+      header.e_phoff = reverse_4(header.e_phoff);
+      header.e_shentsize = reverse_2(header.e_shentsize);
+      header.e_shnum = reverse_2(header.e_shnum);
+      header.e_shoff = reverse_4(header.e_shoff);
+      header.e_shstrndx = reverse_2(header.e_shstrndx);
+      header.e_type = reverse_2(header.e_type);
+      header.e_version = reverse_4(header.e_version);
+      header.e_entry = reverse_4(header.e_entry);}
+} 
+void section_to_little_endian(){
+   if(ENDIAN==1){
+   section.sh_name = reverse_4(section.sh_name);
+   section.sh_type = reverse_4(section.sh_type);
+   section.sh_flags = reverse_4(section.sh_flags);
+   section.sh_addr = reverse_4(section.sh_addr);
+   section.sh_offset = reverse_4(section.sh_offset);
+   section.sh_size = reverse_4(section.sh_size);
+   section.sh_link = reverse_4(section.sh_link);
+   section.sh_info = reverse_4(section.sh_info);
+   section.sh_addralign = reverse_4(section.sh_addralign);
+   section.sh_entsize = reverse_4(section.sh_entsize);}
+}
 void load_data(FILE *file)
 {
    if (file)
    {
       if (!fread(&header, 1, sizeof(header), file))
       {
-         printf("Error");
+         printf("Error header");
          exit(1);
       }
-      fseek(file, header.e_shoff + header.e_shstrndx* sizeof(section), SEEK_SET);
+      get_magic();
+      get_class();
+      get_donnees();
+      header_to_little_endian();
+      
+      fseek(file, (header.e_shoff) + (header.e_shstrndx) * sizeof(section), SEEK_SET);
       if (!fread(&section, 1, sizeof(section), file))
       {
-         printf("Error");
+         printf("Error section");
          exit(1);
       }
+      section_to_little_endian();
       if (header.e_ident[0] == 0x7f && header.e_ident[1] == 'E' && header.e_ident[2] == 'L' && header.e_ident[3] == 'F')
       {
-        	//ignore
+         //ignore
       }
       else
       {
