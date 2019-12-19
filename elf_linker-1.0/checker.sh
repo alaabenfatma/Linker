@@ -1,5 +1,5 @@
 ###########################################
-Tests=("foo.o" "/bin/ls" "checker.sh" "Examples_loader/example1.o")
+Tests=("foo.o" "checker.sh" "Examples_loader/example1.o")
 ###########################################
 affiche_etape(){
     echo "Choisir une Etape à vérifier: "
@@ -12,6 +12,7 @@ affiche_etape(){
     echo "Etape à vérifier:"
 }
 etape1(){
+    Flag_etape1=0
     for f in "${Tests[@]}"; do
         echo "*******************************************"
         echo "Testing the file : $f"
@@ -32,19 +33,79 @@ etape1(){
         fi
     done
 }
-etape2(){
-    Numéro=0
-    echo "*******************************************"
-    first=$(readelf -S foo.o | cut -d"]" -f1 | cut -d"[" -f2 | sed '1,5d' | cut -d' ' -f2 | sed  '/^des/d' | tr -d "\n\t" )
-    second=$(./elf_dumper foo.o | egrep "Numéro" | cut -d":" -f2 | tr -d "\n\t ")
-    #echo "$first"
-    #echo "*******************************************"
-    #echo "$second"
-    if [[ $first == $second ]] ; then
-            echo "GOOD TEST"
-    else
-            echo "WRONG TEST"
+verif_nb_ligne(){
+    Flag=0
+    first_N=$(readelf -S $1 | cut -d"]" -f1 | cut -d"[" -f2 | sed '1,5d' | cut -d' ' -f2 | sed  '/^des/d' | tr -d "\n\t" )
+    second_N=$(./elf_dumper $1 | egrep "Numéro" | cut -d":" -f2 | tr -d "\n\t ")
+    if [[ $first_N != $second_N ]] ; then
+	    Flag=1
     fi
+    return $Flag
+}
+verif_name(){
+    Flag=0
+    first=$(readelf -S $1 | cut -d"]" -f2 | cut -d" " -f2 | sed '1,5'd | sed '/^des/d' | tr -d "\n\t" )
+    second=$(./elf_dumper $1 | egrep "Nom" | cut -d":" -f2 | sed '1,2'd | tr -d "\n\t ")
+    if [[ $first != $second ]] ; then
+	   Flag=1
+    fi
+    return $Flag
+}
+verif_type(){
+    Flag=0
+    compteur=1
+    second=$(./elf_dumper $1 | egrep "Type" | sed '1d' | cut -d":" -f2 | tr -d "\t")
+    for i in $second
+    do
+        first=$(readelf -S $1 | sed '1,4'd | egrep "]" | cut -d"]" -f2 | sed -n ${compteur}p | tr -d " ")
+        #echo "$first" | egrep -q "$i"
+        #echo "$first"
+        #echo "$i"
+        if [[ $? -ne 0 ]] ;then
+            Flag=1
+            return $Flag
+        fi
+        compteur=$((compteur+1))
+    done
+    return $Flag
+}
+
+etape2(){
+    flag_test=0
+    for f in "${Tests[@]}"; do
+        echo "*******************************************"
+        echo "Testing the file : $f"
+        verif_nb_ligne $f
+        val_ret=$?
+        if [[ val_ret -eq 0 ]]
+        then
+            verif_name $f
+            val_ret=$?
+            if [[ val_ret -eq 0 ]]
+            then
+                verif_type $f
+                val_ret=$?
+                if [[ val_ret -eq 1 ]]
+                then
+                    flag_test=1
+                    echo "WRONG TEST"
+                    echo "Type des sections different"
+                fi
+            else
+                flag_test=1
+                echo "WRONG TEST"
+                echo "Nom des sections different"
+            fi
+        else
+            flag_test=1
+            echo "WRONG TEST"
+            echo "Nombre de sections different"
+        fi
+        if [[ flag_test -eq 0 ]]
+        then
+            echo "GOOD TEST"
+        fi
+    done
 }
 etape3(){
     echo "etape3"
@@ -82,4 +143,3 @@ case $no_etape in
         ;;
         *)
 esac
-        
