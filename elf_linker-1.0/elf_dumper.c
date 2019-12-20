@@ -1160,7 +1160,11 @@ void etape4(FILE *file)
 
       }
 
-
+     // printf(" Lien: %x \n", ELF32_ST_BIND(symb.st_info));
+      switch (ELF32_ST_BIND(symb.st_info)){
+            case STB_LOCAL: printf("Lien: LOCAL |");break;
+            case STB_GLOBAL: printf("Lien: GLOBAL |");break;
+      }
       //printf("symb.st_info = %i", symb.st_info);
       //printf("Vis : %x  ", symb.st_other);
 
@@ -1186,7 +1190,8 @@ void etape4(FILE *file)
             case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;	/* End of reserved indices */
             default : printf("Ndx: %d |", symb.st_shndx); break;
       }
-      printf("Nom: %x\n", symb.st_name);
+      printf("Nom: %x \n", symb.st_name);
+      
    }
 }
 
@@ -1227,10 +1232,10 @@ int main(int argc, char *argv[])
    etape1(file);
    etape2(file);
    int x = 0;
-   scanf("%d", &x);
-   etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
+   //scanf("%d", &x);
+   //etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
    etape4(file);
-   etape5(file);
+   //etape5(file);
    fclose(file);
    return 0;
 }
