@@ -1,4 +1,3 @@
-.global main
 .text
 main:
     mov r0, #0x12

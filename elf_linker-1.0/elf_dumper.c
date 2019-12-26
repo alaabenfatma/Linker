@@ -1265,11 +1265,12 @@ int main(int argc, char *argv[])
 {
    FILE *file = fopen(argv[1], "rb");
    etape1(file);
-   //etape2(file);
-   //int x = 0;
-   //scanf("%d", &x);
-   //etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
-   //etape4(file);
+   etape2(file);
+   int x = 0;
+   scanf("%d", &x);
+   printf("Section number : ");
+   etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
+   etape4(file);
    etape5(file);
    fclose(file);
    return 0;
