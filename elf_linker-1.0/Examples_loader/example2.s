@@ -1,5 +1,8 @@
 .text
-main:
+.data
+str:
+        .ascii  "Goodbye World!\000"
+x:
     mov r0, #0x12
     mov r1, #0x34
     add r0, r1, r0, lsl #8
