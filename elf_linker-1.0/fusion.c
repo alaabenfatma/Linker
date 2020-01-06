@@ -35,11 +35,18 @@ int main(int argc, char *argv[])
        fseek(elffile2, headerfile2.e_shoff + i* sizeof(section), SEEK_SET);
        fread(&sectionfile2, 1 , sizeof (section), elffile2);
        if (sectionfile1.sh_type == sectionfile2.sh_type ){ //faut faire un test ici pour comparer les noms (pas les types) des sections
-         fseek(elffileout,headerfileout.e_shoff + i* sizeof(section),SEEK_SET );
-         fwrite(&sectionfile1,1, sizeof(section), elffileout);
-         fseek(elffileout,headerfileout.e_shoff + (i+1)* sizeof(section),SEEK_SET );
-         fwrite(&sectionfile2,1, sizeof(section), elffileout);
-         // on a concatené les sections de meme nom
+         if (sectionfile1.sh_name == sectionfile2.sh_name){
+           fseek(elffileout,headerfileout.e_shoff + i* sizeof(section),SEEK_SET );
+           fwrite(&sectionfile1,1, sizeof(section), elffileout);
+           fwrite(&sectionfile2,1, sizeof(section), elffileout);
+           // on a concatené les sections de meme nom
+         }
+         else {
+           fseek(elffileout,headerfileout.e_shoff + i* sizeof(section),SEEK_SET );
+           fwrite(&sectionfile1,1, sizeof(section), elffileout);
+           fseek(elffileout,headerfileout.e_shoff + (i+1)* sizeof(section),SEEK_SET );
+           fwrite(&sectionfile2,1, sizeof(section), elffileout);
+         }
        }
      }
    }
