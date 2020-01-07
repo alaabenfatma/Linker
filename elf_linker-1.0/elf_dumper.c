@@ -8,6 +8,71 @@ Elf32_Rel rel;
 char sec_names[100];
 char *symb_names = NULL;
 
+//retourne 1 dans le cas de definitions multiples de fonctions
+//TODO: Il faut avoir d'abord le nom des fonctions !!!!! Ensuite on les compares car ici (provisoirement) on compare leur numero
+int has_multiple_declarations(FILE* f1, FILE* f2){
+    Elf32_Ehdr header1;
+    Elf32_Shdr section1;
+    Elf32_Sym symb1;
+      Elf32_Rela rela1;
+      Elf32_Rel rel1;
+      char *sec_names1 = NULL;
+      char *symb_names1 = NULL;
+    header1 = load_data(f1,&section1);
+    int indice_tab_symb1 = get_tab_symb(f1,section1,header1);
+   if(indice_tab_symb1 == -1){
+     return 0;
+   }
+   fseek(f1, header1.e_shoff + indice_tab_symb1* sizeof(section1), SEEK_SET);	//on va a la section de la table des symboles
+   fread(&section1, 1, sizeof(section1), f1);
+   section_to_little_endian(&section1);
+   int count1 = section1.sh_size / section1.sh_entsize;	//nombre d'entree dans la table des symboles
+   //printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb1, count1);
+   fseek(f1, section1.sh_offset, SEEK_SET);
+
+    Elf32_Ehdr header2;
+    Elf32_Shdr section2;
+    Elf32_Sym symb2;
+      Elf32_Rela rela2;
+      Elf32_Rel rel2;
+      char *sec_names2 = NULL;
+      char *symb_names2 = NULL;
+    header2 = load_data(f2,&section2);
+    int indice_tab_symb2 = get_tab_symb(f2,section2,header2);
+   if(indice_tab_symb2 == -1){
+     return 0;
+   }
+   fseek(f2, header2.e_shoff + indice_tab_symb2* sizeof(section2), SEEK_SET);	//on va a la section de la table des symboles
+   fread(&section2, 1, sizeof(section2), f2);
+   section_to_little_endian(&section2);
+   int count2 = section2.sh_size / section2.sh_entsize;	//nombre d'entree dans la table des symboles
+   //printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb, count2);
+   fseek(f2, section2.sh_offset, SEEK_SET);
+
+   double r1=0;
+   double r2=0;
+
+   //On compare le nom des tables des symboles du premier fichier avec ceux du deuxième fichier
+   for (int i = 0; i < count1; i++)
+   {
+      fread(&symb1, 1, sizeof(symb1), f1);
+      symbol_to_little_endian();
+      r1 = section1.sh_offset* symb1.st_name;
+      for (int j = 0; j < count2; j++){
+         fread(&symb2, 1, sizeof(symb2), f1);
+         symbol_to_little_endian();
+         r1 = section2.sh_offset* symb2.st_name;
+         if((r2!=0)&&(r1 == r2)){
+               printf("ERREUR: La fonction %x est definie dans les deux fichiers \n",symb2.st_name);
+               return 1;
+         }   
+      }
+   }
+   printf("All good");
+   return 0;
+    
+}
+
 void header_to_little_endian(Elf32_Ehdr *header)
 {
       if(ENDIAN==1){
