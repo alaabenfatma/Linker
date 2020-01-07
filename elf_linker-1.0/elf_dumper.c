@@ -1,107 +1,43 @@
 #include "brain.h"
 
 //local header
-//Elf32_Shdr section;
+Elf32_Ehdr header;
+Elf32_Shdr section;
 Elf32_Sym symb;
 Elf32_Rela rela;
 Elf32_Rel rel;
-char sec_names[100];
+char *sec_names = NULL;
 char *symb_names = NULL;
 
-//retourne 1 dans le cas de definitions multiples de fonctions
-//TODO: Il faut avoir d'abord le nom des fonctions !!!!! Ensuite on les compares car ici (provisoirement) on compare leur numero
-int has_multiple_declarations(FILE* f1, FILE* f2){
-    Elf32_Ehdr header1;
-    Elf32_Shdr section1;
-    Elf32_Sym symb1;
-      Elf32_Rela rela1;
-      Elf32_Rel rel1;
-      char *sec_names1 = NULL;
-      char *symb_names1 = NULL;
-    header1 = load_data(f1,&section1);
-    int indice_tab_symb1 = get_tab_symb(f1,section1,header1);
-   if(indice_tab_symb1 == -1){
-     return 0;
-   }
-   fseek(f1, header1.e_shoff + indice_tab_symb1* sizeof(section1), SEEK_SET);	//on va a la section de la table des symboles
-   fread(&section1, 1, sizeof(section1), f1);
-   section_to_little_endian(&section1);
-   int count1 = section1.sh_size / section1.sh_entsize;	//nombre d'entree dans la table des symboles
-   //printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb1, count1);
-   fseek(f1, section1.sh_offset, SEEK_SET);
-
-    Elf32_Ehdr header2;
-    Elf32_Shdr section2;
-    Elf32_Sym symb2;
-      Elf32_Rela rela2;
-      Elf32_Rel rel2;
-      char *sec_names2 = NULL;
-      char *symb_names2 = NULL;
-    header2 = load_data(f2,&section2);
-    int indice_tab_symb2 = get_tab_symb(f2,section2,header2);
-   if(indice_tab_symb2 == -1){
-     return 0;
-   }
-   fseek(f2, header2.e_shoff + indice_tab_symb2* sizeof(section2), SEEK_SET);	//on va a la section de la table des symboles
-   fread(&section2, 1, sizeof(section2), f2);
-   section_to_little_endian(&section2);
-   int count2 = section2.sh_size / section2.sh_entsize;	//nombre d'entree dans la table des symboles
-   //printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb, count2);
-   fseek(f2, section2.sh_offset, SEEK_SET);
-
-   double r1=0;
-   double r2=0;
-
-   //On compare le nom des tables des symboles du premier fichier avec ceux du deuxième fichier
-   for (int i = 0; i < count1; i++)
-   {
-      fread(&symb1, 1, sizeof(symb1), f1);
-      symbol_to_little_endian();
-      r1 = section1.sh_offset* symb1.st_name;
-      for (int j = 0; j < count2; j++){
-         fread(&symb2, 1, sizeof(symb2), f1);
-         symbol_to_little_endian();
-         r1 = section2.sh_offset* symb2.st_name;
-         if((r2!=0)&&(r1 == r2)){
-               printf("ERREUR: La fonction %x est definie dans les deux fichiers \n",symb2.st_name);
-               return 1;
-         }   
-      }
-   }
-   printf("All good");
-   return 0;
-    
-}
-
-void header_to_little_endian(Elf32_Ehdr *header)
+void header_to_little_endian()
 {
       if(ENDIAN==1){
-      header->e_flags = reverse_4(header->e_flags);
-      header->e_ehsize = reverse_2(header->e_ehsize);
-      header->e_machine = reverse_2(header->e_machine);
-      header->e_phentsize = reverse_2(header->e_phentsize);
-      header->e_phnum = reverse_2(header->e_phnum);
-      header->e_phoff = reverse_4(header->e_phoff);
-      header->e_shentsize = reverse_2(header->e_shentsize);
-      header->e_shnum = reverse_2(header->e_shnum);
-      header->e_shoff = reverse_4(header->e_shoff);
-      header->e_shstrndx = reverse_2(header->e_shstrndx);
-      header->e_type = reverse_2(header->e_type);
-      header->e_version = reverse_4(header->e_version);
-      header->e_entry = reverse_4(header->e_entry);}
+      header.e_flags = reverse_4(header.e_flags);
+      header.e_ehsize = reverse_2(header.e_ehsize);
+      header.e_machine = reverse_2(header.e_machine);
+      header.e_phentsize = reverse_2(header.e_phentsize);
+      header.e_phnum = reverse_2(header.e_phnum);
+      header.e_phoff = reverse_4(header.e_phoff);
+      header.e_shentsize = reverse_2(header.e_shentsize);
+      header.e_shnum = reverse_2(header.e_shnum);
+      header.e_shoff = reverse_4(header.e_shoff);
+      header.e_shstrndx = reverse_2(header.e_shstrndx);
+      header.e_type = reverse_2(header.e_type);
+      header.e_version = reverse_4(header.e_version);
+      header.e_entry = reverse_4(header.e_entry);}
 }
-void section_to_little_endian(Elf32_Shdr *section){
+void section_to_little_endian(){
    if(ENDIAN==1){
-   section->sh_name = reverse_4(section->sh_name);
-   section->sh_type = reverse_4(section->sh_type);
-   section->sh_flags = reverse_4(section->sh_flags);
-   section->sh_addr = reverse_4(section->sh_addr);
-   section->sh_offset = reverse_4(section->sh_offset);
-   section->sh_size = reverse_4(section->sh_size);
-   section->sh_link = reverse_4(section->sh_link);
-   section->sh_info = reverse_4(section->sh_info);
-   section->sh_addralign = reverse_4(section->sh_addralign);
-   section->sh_entsize = reverse_4(section->sh_entsize);}
+   section.sh_name = reverse_4(section.sh_name);
+   section.sh_type = reverse_4(section.sh_type);
+   section.sh_flags = reverse_4(section.sh_flags);
+   section.sh_addr = reverse_4(section.sh_addr);
+   section.sh_offset = reverse_4(section.sh_offset);
+   section.sh_size = reverse_4(section.sh_size);
+   section.sh_link = reverse_4(section.sh_link);
+   section.sh_info = reverse_4(section.sh_info);
+   section.sh_addralign = reverse_4(section.sh_addralign);
+   section.sh_entsize = reverse_4(section.sh_entsize);}
 }
 
 void symbol_to_little_endian(){
@@ -129,9 +65,8 @@ void rel_to_little_endian(){
    rel.r_info = reverse_4(rel.r_info);}
 }
 
-Elf32_Ehdr  load_data(FILE *file, Elf32_Shdr *section)
+void load_data(FILE *file)
 {
-   Elf32_Ehdr header;
    if (file)
    {
       if (!fread(&header, 1, sizeof(header), file))
@@ -139,14 +74,19 @@ Elf32_Ehdr  load_data(FILE *file, Elf32_Shdr *section)
          printf("Error header");
          exit(1);
       }
-      get_magic(&header);
-      get_class(&header);
-      get_donnees(&header);
-      header_to_little_endian(&header);
-       if (header.e_ident[0] == 0x7f &&
-       header.e_ident[1] == 'E' && 
-       header.e_ident[2] == 'L' && 
-       header.e_ident[3] == 'F')
+      get_magic();
+      get_class();
+      get_donnees();
+      header_to_little_endian();
+
+      fseek(file, (header.e_shoff) + (header.e_shstrndx) * sizeof(section), SEEK_SET);
+      if (!fread(&section, 1, sizeof(section), file))
+      {
+         printf("Error section");
+         exit(1);
+      }
+      section_to_little_endian();
+      if (header.e_ident[0] == 0x7f && header.e_ident[1] == 'E' && header.e_ident[2] == 'L' && header.e_ident[3] == 'F')
       {
          //ignore
       }
@@ -155,76 +95,66 @@ Elf32_Ehdr  load_data(FILE *file, Elf32_Shdr *section)
          printf("Not a valid ELF format.\n");
          exit(1);
       }
-      fseek(file, (header.e_shoff) + (header.e_shstrndx) * sizeof(section), SEEK_SET);
-      if (!fread(&section, 1, sizeof(section), file))
-      {
-         printf("Error section");
-         exit(1);
-      }
-      section_to_little_endian(&section);
-     
    }
    else
    {
       printf("Erreur d'ouverture du fichier\n.");
    }
-
-   return header;
 }
-void get_magic(Elf32_Ehdr *header)
+void get_magic()
 {
    printf("Magique: ");
    for (int i = 0; i < 16; i++)
    {
-      printf("%02x ", header->e_ident[i]);
+      printf("%02x ", header.e_ident[i]);
    }
    printf("\n");
 }
-void get_class(Elf32_Ehdr *header)
+void get_class()
 {
-   if (header->e_ident[4] == 0x0)
+   if (header.e_ident[4] == 0x0)
    {
       printf("Classe:\tN'est pas valable.\n");
    }
-   else if (header->e_ident[4] == 0x1)
+   else if (header.e_ident[4] == 0x1)
    {
       printf("Classe:\tELF32\n");
    }
-   else if (header->e_ident[4] == 0x2)
+   else if (header.e_ident[4] == 0x2)
    {
       printf("Classe:\tELF64\n");
    }
 }
-void get_donnees(Elf32_Ehdr *header)
+void get_donnees()
 {
-   if (header->e_ident[5] == 0x0)
+   if (header.e_ident[5] == 0x0)
    {
       printf("Données: Format de données inconnu.\n");
    }
-   else if (header->e_ident[5] == 0x1)
+   else if (header.e_ident[5] == 0x1)
    {
       printf("Données: complément à 2, système à octets de poids faible d'abord (little endian) \n");
    }
-   else if (header->e_ident[5] == 0x2)
+   else if (header.e_ident[5] == 0x2)
    {
       printf("Données: Complément à 2, système à octets de poids fort d'abord (big endian)\n");
       ENDIAN = 1;
    }
 }
-void get_e_version(Elf32_Ehdr *header)
+void get_e_version()
 {
-   if (header->e_ident[6] == 0x0)
+   if (header.e_ident[6] == 0x0)
    {
       printf("Version: 0 (e_version non valable)\n");
    }
-   else if (header->e_ident[6] == 0x1)
+   else if (header.e_ident[6] == 0x1)
    {
       printf("Version: 1 (current)\n");
    }
 }
-void get_os(Elf32_Ehdr *header)
+void get_os()
 {
-   switch (header->e_ident[7])
+   switch (header.e_ident[7])
    {
       case 0x0:
          printf("OS/ABI: UNIX System V");
@@ -261,14 +191,14 @@ void get_os(Elf32_Ehdr *header)
    }
    printf("\n");
 }
-void get_ABI(Elf32_Ehdr *header)
+void get_ABI()
 {
-   printf("Version ABI: %x\n", header->e_ident[8]);
+   printf("Version ABI: %x\n", header.e_ident[8]);
 }
-void type_fichier(Elf32_Ehdr *header)
+void type_fichier()
 {
    printf("Type: ");
-   switch (header->e_type)
+   switch (header.e_type)
    {
       case 0x0:
          printf("Type inconnu");
@@ -289,10 +219,10 @@ void type_fichier(Elf32_Ehdr *header)
    printf("\n");
 }
 
-void get_machine(Elf32_Ehdr *header)
+void get_machine()
 {
    printf("Machine : ");
-   switch (header->e_machine)
+   switch (header.e_machine)
    {
       case 0:
          printf("No machine");
@@ -831,70 +761,70 @@ void get_machine(Elf32_Ehdr *header)
    }
 }
 
-void get_e_version2(Elf32_Ehdr *header)
+void get_e_version2()
 {
-   printf("\nVersion: 0x%x \n", header->e_version);
+   printf("\nVersion: 0x%x \n", header.e_version);
 }
 
-void get_e_entry(Elf32_Ehdr *header)
+void get_e_entry()
 {
-   printf("Adresse du point d'entrée: 0x%lx \n", header->e_entry);
+   printf("Adresse du point d'entrée: 0x%lx \n", header.e_entry);
 }
 
-void get_e_phoff(Elf32_Ehdr *header)
+void get_e_phoff()
 {
-   printf("Début des en-têtes de programme : %lx (octets dans le fichier)\n", header->e_phoff);
+   printf("Début des en-têtes de programme : %lx (octets dans le fichier)\n", header.e_phoff);
 }
 
-void get_e_shoff(Elf32_Ehdr *header)
+void get_e_shoff()
 {
-   printf("Début des en-têtes de section : %li (octets dans le fichier)\n", header->e_shoff);
+   printf("Début des en-têtes de section : %li (octets dans le fichier)\n", header.e_shoff);
 }
 
-void get_e_flags(Elf32_Ehdr *header)
+void get_e_flags()
 {
-   printf("Fanions : 0x%x\n", header->e_flags);
+   printf("Fanions : 0x%x\n", header.e_flags);
 }
 
-void get_e_ehsize(Elf32_Ehdr *header)
+void get_e_ehsize()
 {
-   printf("Taille de cet en-tête: %i (octets)\n", header->e_ehsize);
+   printf("Taille de cet en-tête: %i (octets)\n", header.e_ehsize);
 }
 
-void get_e_phentsize(Elf32_Ehdr *header)
+void get_e_phentsize()
 {
-   printf("Taille de l'en-tête du programme: %d (octets)\n", header->e_phentsize);
+   printf("Taille de l'en-tête du programme: %d (octets)\n", header.e_phentsize);
 }
 
-void get_e_phnum(Elf32_Ehdr *header)
+void get_e_phnum()
 {
-   printf("Nombre d'en-tête du programme: %d  \n", header->e_phnum);
+   printf("Nombre d'en-tête du programme: %d  \n", header.e_phnum);
 }
 
-void get_e_shentsize(Elf32_Ehdr *header)
+void get_e_shentsize()
 {
-   printf("Taille des en-têtes de section:  %d (octets) \n", header->e_shentsize);
+   printf("Taille des en-têtes de section:  %d (octets) \n", header.e_shentsize);
 }
 
-void get_e_shnum(Elf32_Ehdr *header)
+void get_e_shnum()
 {
-   printf("Nombre d'en-têtes de section:   %d \n", header->e_shnum);
+   printf("Nombre d'en-têtes de section:   %d \n", header.e_shnum);
 }
 
-void get_e_shstrndx(Elf32_Ehdr *header)
+void get_e_shstrndx()
 {
-   printf("Table d'indexes des chaînes d'en-tête de section: %d \n", header->e_shstrndx);
+   printf("Table d'indexes des chaînes d'en-tête de section: %d \n", header.e_shstrndx);
 }
 
-void get_sh_name(Elf32_Shdr *section)
+void get_sh_name()
 {
-   printf("Nom de la section: '%s' \n", section->sh_name);
+   printf("Nom de la section: '%c' \n", section.sh_name);
 }
 
-void get_sh_type(Elf32_Shdr *section)
+void get_sh_type()
 {
    printf("Type de la section: ");
-   switch (section->sh_type)
+   switch (section.sh_type)
    {
       case 0:
          printf("Section header table entry unused");
@@ -969,10 +899,10 @@ void get_sh_type(Elf32_Shdr *section)
          printf("Sun-specific low bound.");
          break;
       case 0x6ffffffd:
-         printf("Version definition section");
+         printf("Version definition section.");
          break;
       case 0x6ffffffe:
-         printf("Version needs section");
+         printf("Version needs section.");
          break;
       case 0x6fffffff:
          printf("Version symbol table.");
@@ -996,135 +926,52 @@ void get_sh_type(Elf32_Shdr *section)
          break;
    }
 }
-void surf_sections(Elf32_Shdr *section)
+void surf_sections()
 {
    printf("\n");
    for (int i = 0; i < 4; i++)
    {
-      printf("%c", (section->sh_name + i));
+      printf("%c", (section.sh_name + i));
    }
 }
-void get_section_names(FILE *file,Elf32_Shdr section)
+void get_section_names(FILE *file)
 {
   	//Lire les noms of sections
+   sec_names = malloc(section.sh_size);
    fseek(file, section.sh_offset, SEEK_SET);
-   fread(&sec_names, 1, section.sh_size, file);
-   
+   fread(sec_names, 1, section.sh_size, file);
 }
-void etape1(FILE *f,Elf32_Ehdr *header)
+void etape1(FILE *f)
 {
-   /*header = load_data(f,);
-   get_e_version(&header);
-   get_os(&header);
-   get_ABI(&header);
-   type_fichier(&header);
-   get_machine(&header);
-   get_e_version2(&header);
-   get_e_entry(&header);
-   get_e_phoff(&header);
-   get_e_shoff(&header);
-   get_e_flags(&header);
-   get_e_ehsize(&header);
-   get_e_phentsize(&header);
-   get_e_phnum(&header);
-   get_e_shentsize(&header);
-   get_e_shnum(&header);
-   get_e_shstrndx(&header);*/
+   load_data(f);
+   get_e_version();
+   get_os();
+   get_ABI();
+   type_fichier();
+   get_machine();
+   get_e_version2();
+   get_e_entry();
+   get_e_phoff();
+   get_e_shoff();
+   get_e_flags();
+   get_e_ehsize();
+   get_e_phentsize();
+   get_e_phnum();
+   get_e_shentsize();
+   get_e_shnum();
+   get_e_shstrndx();
 }
-void dump_section(FILE *f,Elf32_Ehdr header,Elf32_Shdr section){
-printf("\n--- NEW SECTION ---\n");
-   printf("Nom:\t%s \nTaille:\t%d\n",   section.sh_name[sec_names], section.sh_size);
-   printf("Type:\t");
-   
-   switch (section.sh_type)
-   {
-      case 0x0:
-         printf("NULL");
-         break;
-      case 0x1:
-         printf("PROGBITS");
-         break;
-      case 0x2:
-         printf("SYMTAB");
-         break;
-      case 0x3:
-         printf("STRTAB");
-         break;
-      case 0x4:
-         printf("RELA");
-         break;
-      case 0x5:
-         printf("HASH");
-         break;
-      case 0x6:
-         printf("DYNAMIC");
-         break;
-      case 0x7:
-         printf("NOTE");
-         break;
-      case 0x8:
-         printf("NOBITS");
-         break;
-      case 0x9:
-         printf("REL");
-         break;
-      case 0x0A:
-         printf("SHLIB");
-         break;
-
-      default:
-         printf("Type inconnu");
-         break;
-   }
-   printf("\n");
-   printf("Properties (flag %lx) : ", section.sh_flags);
-  	//Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#Section_header
-   if (section.sh_flags &SHF_WRITE)
-      printf("W");
-   if (section.sh_flags &SHF_ALLOC)
-      printf("A");
-   if (section.sh_flags &SHF_EXECINSTR)
-      printf("X");
-   if (section.sh_flags &SHF_MERGE)
-      printf("M");
-   if (section.sh_flags &SHF_STRINGS)
-      printf("S");
-   if (section.sh_flags &SHF_INFO_LINK)
-      printf("I");
-   if (section.sh_flags &SHF_LINK_ORDER)
-      printf("L");
-   if (section.sh_flags &SHF_OS_NONCONFORMING)
-      printf("O");
-   if (section.sh_flags &SHF_GROUP)
-      printf("G");
-   if (section.sh_flags &SHF_TLS)
-      printf("T");
-   if (section.sh_flags &SHF_EXCLUDE)
-      printf("E");
-   printf("\n");
-   printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
-   
-}
-//ndx=0x1 pour afficher que les PROGBITS
-void dump_sections(FILE *file,Elf32_Ehdr header,Elf32_Shdr section,Elf32_Word special_ndx,Elf32_Shdr *secs)
+//TODO Please change the function name later on.
+void dump_sections(FILE *file, int i)
 {
-   
-  // get_section_names(file,section);
-   for (int i = 0; i < header.e_shnum; i++)
-   {
-   
+   if (i == header.e_shnum)
+      return;
    fseek(file, header.e_shoff + i* sizeof(section), SEEK_SET);
    fread(&section, 1, sizeof(section), file);
-   section_to_little_endian(&section);
-   if(secs!=NULL){
-      secs[i] = section;
-   }
-   if(special_ndx != -1 && section.sh_type!=special_ndx)
-      continue;
+   section_to_little_endian();
    printf("\n--- NEW SECTION ---\n");
-   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%d\n", i,   section.sh_name[sec_names], section.sh_size);
+   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%lx\n", i, sec_names + section.sh_name, section.sh_size);
    printf("Type:\t");
-   
    switch (section.sh_type)
    {
       case 0x0:
@@ -1192,28 +1039,27 @@ void dump_sections(FILE *file,Elf32_Ehdr header,Elf32_Shdr section,Elf32_Word sp
       printf("E");
    printf("\n");
    printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
-   
+   dump_sections(file, i + 1);
 }
-}
-   
-void etape2(FILE *f,Elf32_Ehdr *header)
+void etape2(FILE *f)
 {
-   /*get_section_names(f);
-   dump_sections(f,&header,-1,NULL);*/
+   get_section_names(f);
+   dump_sections(f, 0);
 }
-void etape3(FILE *f, int x,Elf32_Shdr section,Elf32_Ehdr header)
+void etape3(FILE *f, int x)
 {
-   fseek(f, header.e_shoff + x* sizeof(Elf32_Shdr), SEEK_SET);
+
+   fseek(f, header.e_shoff + x* sizeof(section), SEEK_SET);
    fread(&section, 1, sizeof(section), f);
-   section_to_little_endian(&section);
+   section_to_little_endian();
    unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
   	//TODO: Show section name:
-  printf("\nVidange hexadécimale de la section « %s » :\n", sec_names );
+   printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
    int j, k;
    int printed_smth = 0;
    fseek(f, section.sh_offset, SEEK_SET);
-  	// Process every byte in the data of the section->
+  	// Process every byte in the data of the section.
    int i = 0;
    int counter = i;
    while (i < section.sh_size)
@@ -1260,7 +1106,7 @@ void etape3(FILE *f, int x,Elf32_Shdr section,Elf32_Ehdr header)
             else {}
          }
       }
-      if (counter > 0 )
+      if (counter > 0)
          for (int n = 0; n < strlen(ASCII_DUMP) + 1; n++)
          {
             if (ASCII_DUMP[n] >= ' ' && ASCII_DUMP[n] <= '~')
@@ -1273,15 +1119,13 @@ void etape3(FILE *f, int x,Elf32_Shdr section,Elf32_Ehdr header)
    printf("\n");
 }
 
-int get_tab_symb(FILE *file, Elf32_Shdr section,Elf32_Ehdr header)
+int get_tab_symb(FILE *file, int i)
 {
-   
-   for (size_t i = 0; i < header.e_shnum; i++)
-   {
-   
-   fseek(file, header.e_shoff + i* sizeof(Elf32_Shdr), SEEK_SET);
+   if (i == header.e_shnum)
+      return;
+   fseek(file, header.e_shoff + i* sizeof(section), SEEK_SET);
    fread(&section, 1, sizeof(section), file);
-   section_to_little_endian(&section);
+   section_to_little_endian();
    switch (section.sh_type)
    {
       case 0x0:
@@ -1309,21 +1153,19 @@ int get_tab_symb(FILE *file, Elf32_Shdr section,Elf32_Ehdr header)
       default:
          break;
    }
-   }
-   return ;
-}
+   get_tab_symb(file, i+1);
+ }
 
-void etape4(FILE *file,Elf32_Shdr  section,Elf32_Ehdr header)
+void etape4(FILE *file)
 {
-   
-   int indice_tab_symb = get_tab_symb(file,section,header);
+   int indice_tab_symb = get_tab_symb(file, 0);
    if(indice_tab_symb == -1){
      printf("Pas de table des symboles");
      return;
    }
    fseek(file, header.e_shoff + indice_tab_symb* sizeof(section), SEEK_SET);	//on va a la section de la table des symboles
    fread(&section, 1, sizeof(section), file);
-   section_to_little_endian(&section);
+   section_to_little_endian();
    int count = section.sh_size / section.sh_entsize;	//nombre d'entree dans la table des symboles
    printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb, count);
    fseek(file, section.sh_offset, SEEK_SET);
@@ -1382,20 +1224,18 @@ void etape4(FILE *file,Elf32_Shdr  section,Elf32_Ehdr header)
             case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;	/* End of reserved indices */
             default : printf("Ndx: %d |", symb.st_shndx); break;
       }
-      printf("Nom: %x \n", section.sh_offset* symb.st_name);
-
+      printf("Nom: %x \n", symb.st_name);
 
    }
 }
 
-void etape5(FILE *file,Elf32_Shdr section ,Elf32_Ehdr header)
+void etape5(FILE *file)
 {
-   
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i *sizeof(section), SEEK_SET);
       fread(&section, 1, sizeof(section), file);
-      section_to_little_endian(&section);
+      section_to_little_endian();
       if (section.sh_type == 4 || section.sh_type == 9){
         int count = section.sh_size / section.sh_entsize;
         printf("\nSection de redressage numéro : %d\n", i);
@@ -1424,35 +1264,14 @@ void etape5(FILE *file,Elf32_Shdr section ,Elf32_Ehdr header)
 int main(int argc, char *argv[])
 {
    FILE *file = fopen(argv[1], "rb");
-   //etape1(file);
-   Elf32_Ehdr header;
-   Elf32_Shdr section;
-   header = load_data(file,&section);
-   get_e_version(&header);
-   get_os(&header);
-   get_ABI(&header);
-   type_fichier(&header);
-   get_machine(&header);
-   get_e_version2(&header);
-   get_e_entry(&header);
-   get_e_phoff(&header);
-   get_e_shoff(&header);
-   get_e_flags(&header);
-   get_e_ehsize(&header);
-   get_e_phentsize(&header);
-   get_e_phnum(&header);
-   get_e_shentsize(&header);
-   get_e_shnum(&header);
-   get_e_shstrndx(&header);
-  //etape2(file);
-   get_section_names(file,section);
-   dump_sections(file,header,section,-1,NULL);
+   etape1(file);
+   etape2(file);
    int x = 0;
    scanf("%d", &x);
    printf("Section number : ");
-  etape3(file,x,section,header);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
-   etape4(file,section,header);
-   etape5(file,section,header);
+   etape3(file, x);	//TODO afficher "pas de données a dump/vidanger si le ontenu de la section est vide"
+   etape4(file);
+   etape5(file);
    fclose(file);
    return 0;
 }
