@@ -434,7 +434,7 @@ gives unlimited permission to copy, distribute and modify it."
 ac_pwd='/home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
-MKDIR_P='/bin/mkdir -p'
+MKDIR_P='/usr/bin/mkdir -p'
 AWK='gawk'
 test -n "$AWK" || AWK=awk
 # The default lists apply if the user does not specify any file.
@@ -522,7 +522,7 @@ _ASBOX
 #
 # INIT-COMMANDS
 #
-AMDEP_TRUE="" ac_aux_dir="build-aux"
+AMDEP_TRUE="" MAKE="make"
 
 
 # Handling of arguments.
@@ -601,14 +601,14 @@ S["LTLIBOBJS"]=""
 S["HAVE_ARM_COMPILER_FALSE"]="#"
 S["HAVE_ARM_COMPILER_TRUE"]=""
 S["subdirs_custom"]=" Examples_loader Examples_fusion"
-S["GCC_CROSS"]="arm-none-eabi-gcc"
+S["GCC_CROSS"]="arm-eabi-gcc"
 S["LIBOBJS"]=""
-S["EGREP"]="/bin/grep -E"
-S["GREP"]="/bin/grep"
+S["EGREP"]="/usr/bin/grep -E"
+S["GREP"]="/usr/bin/grep"
 S["CPP"]="gcc -E"
-S["LEXLIB"]="-lfl"
-S["LEX_OUTPUT_ROOT"]="lex.yy"
-S["LEX"]="flex"
+S["LEXLIB"]=""
+S["LEX_OUTPUT_ROOT"]=""
+S["LEX"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing flex"
 S["am__fastdepCC_FALSE"]="#"
 S["am__fastdepCC_TRUE"]=""
 S["CCDEPMODE"]="depmode=gcc3"
@@ -616,7 +616,6 @@ S["am__nodep"]="_no"
 S["AMDEPBACKSLASH"]="\\"
 S["AMDEP_FALSE"]="#"
 S["AMDEP_TRUE"]=""
-S["am__quote"]=""
 S["am__include"]="include"
 S["DEPDIR"]=".deps"
 S["OBJEXT"]="o"
@@ -637,15 +636,15 @@ S["am__leading_dot"]="."
 S["SET_MAKE"]=""
 S["AWK"]="gawk"
 S["mkdir_p"]="$(MKDIR_P)"
-S["MKDIR_P"]="/bin/mkdir -p"
+S["MKDIR_P"]="/usr/bin/mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]=""
 S["install_sh"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/install-sh"
 S["MAKEINFO"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing makeinfo"
 S["AUTOHEADER"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing autoheader"
-S["AUTOMAKE"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing automake-1.15"
+S["AUTOMAKE"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing automake-1.16"
 S["AUTOCONF"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing autoconf"
-S["ACLOCAL"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing aclocal-1.15"
+S["ACLOCAL"]="${SHELL} /home/b/benfatma/Bureau/PROG/Linker/elf_linker-1.0/build-aux/missing aclocal-1.16"
 S["VERSION"]="1.0"
 S["PACKAGE"]="elf_linker"
 S["CYGPATH_W"]="echo"
@@ -661,13 +660,13 @@ S["ECHO_T"]=""
 S["ECHO_N"]="-n"
 S["ECHO_C"]=""
 S["DEFS"]="-DPACKAGE_NAME=\\\"ELF_Linker\\\" -DPACKAGE_TARNAME=\\\"elf_linker\\\" -DPACKAGE_VERSION=\\\"1.0\\\" -DPACKAGE_STRING=\\\"ELF_Linker\\ 1.0\\\" -DPACKAGE_BUGREPORT=\\\""\
-"Guillaume.Huard@imag.fr\\\" -DPACKAGE_URL=\\\"\\\" -DPACKAGE=\\\"elf_linker\\\" -DVERSION=\\\"1.0\\\" -DYYTEXT_POINTER=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DH"\
-"AVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -D"\
-"HAVE_ARPA_INET_H=1 -DHAVE_FCNTL_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_NETDB_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_STRINGS_H="\
-"1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_SYS_TIME_H=1 -DHAVE_UNISTD_H=1 -DHAVE_FORK=1 -DHAVE_VFORK=1 -DHAVE_WORKING_VFORK=1 -DHAVE_WORKING_FORK=1 -DHAVE_STDLI"\
-"B_H=1 -DHAVE_MALLOC=1 -DHAVE_STDLIB_H=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_GETPAGESIZE=1 -DHAVE_MMAP=1 -DHAVE_STDLIB_H=1 -DHAVE_REALLOC=1"\
-" -DHAVE_ALARM=1 -DHAVE_BZERO=1 -DHAVE_DUP2=1 -DHAVE_GETHOSTBYADDR=1 -DHAVE_GETHOSTBYNAME=1 -DHAVE_MUNMAP=1 -DHAVE_SELECT=1 -DHAVE_SOCKET=1 -DHAVE_ST"\
-"RERROR=1 -DHAVE_MEMSET=1"
+"Guillaume.Huard@imag.fr\\\" -DPACKAGE_URL=\\\"\\\" -DPACKAGE=\\\"elf_linker\\\" -DVERSION=\\\"1.0\\\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -D"\
+"HAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_ARPA_INET_H=1 "\
+"-DHAVE_FCNTL_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_NETDB_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_STRINGS_H=1 -DHAVE_SYS_SOCKET"\
+"_H=1 -DHAVE_SYS_TIME_H=1 -DHAVE_UNISTD_H=1 -DHAVE_FORK=1 -DHAVE_VFORK=1 -DHAVE_WORKING_VFORK=1 -DHAVE_WORKING_FORK=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC"\
+"=1 -DHAVE_STDLIB_H=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_GETPAGESIZE=1 -DHAVE_MMAP=1 -DHAVE_STDLIB_H=1 -DHAVE_REALLOC=1 -DHAVE_ALARM=1 -DH"\
+"AVE_BZERO=1 -DHAVE_DUP2=1 -DHAVE_GETHOSTBYADDR=1 -DHAVE_GETHOSTBYNAME=1 -DHAVE_MUNMAP=1 -DHAVE_SELECT=1 -DHAVE_SOCKET=1 -DHAVE_STRERROR=1 -DHAVE_MEM"\
+"SET=1"
 S["mandir"]="${datarootdir}/man"
 S["localedir"]="${datarootdir}/locale"
 S["libdir"]="${exec_prefix}/lib"
@@ -699,6 +698,7 @@ S["PACKAGE_TARNAME"]="elf_linker"
 S["PACKAGE_NAME"]="ELF_Linker"
 S["PATH_SEPARATOR"]=":"
 S["SHELL"]="/bin/bash"
+S["am__quote"]=""
 _ACAWK
 cat >>"$ac_tmp/subs1.awk" <<_ACAWK &&
   for (key in S) S_is_set[key] = 1
@@ -969,29 +969,35 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
   # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
   # if we detect the quoting.
-  case $CONFIG_FILES in
-  *\'*) eval set x "$CONFIG_FILES" ;;
-  *)   set x $CONFIG_FILES ;;
-  esac
+  # TODO: see whether this extra hack can be removed once we start
+  # requiring Autoconf 2.70 or later.
+  case $CONFIG_FILES in #(
+  *\'*) :
+    eval set x "$CONFIG_FILES" ;; #(
+  *) :
+    set x $CONFIG_FILES ;; #(
+  *) :
+     ;;
+esac
   shift
-  for mf
+  # Used to flag and report bootstrapping failures.
+  am_rc=0
+  for am_mf
   do
     # Strip MF so we end up with the name of the file.
-    mf=`echo "$mf" | sed -e 's/:.*$//'`
-    # Check whether this is an Automake generated Makefile or not.
-    # We used to match only the files named 'Makefile.in', but
-    # some people rename them; so instead we look at the file content.
-    # Grep'ing the first line is not enough: some people post-process
-    # each Makefile.in and add a new line on top of each file to say so.
-    # Grep'ing the whole file is not good either: AIX grep has a line
+    am_mf=`$as_echo "$am_mf" | sed -e 's/:.*$//'`
+    # Check whether this is an Automake generated Makefile which includes
+    # dependency-tracking related rules and includes.
+    # Grep'ing the whole file directly is not great: AIX grep has a line
     # limit of 2048, but all sed's we know have understand at least 4000.
-    if sed -n 's,^#.*generated by automake.*,X,p' "$mf" | grep X >/dev/null 2>&1; then
-      dirpart=`$as_dirname -- "$mf" ||
-$as_expr X"$mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$mf" : 'X\(//\)[^/]' \| \
-	 X"$mf" : 'X\(//\)$' \| \
-	 X"$mf" : 'X\(/\)' \| . 2>/dev/null ||
-$as_echo X"$mf" |
+    sed -n 's,^am--depfiles:.*,X,p' "$am_mf" | grep X >/dev/null 2>&1 \
+      || continue
+    am_dirpart=`$as_dirname -- "$am_mf" ||
+$as_expr X"$am_mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"$am_mf" : 'X\(//\)[^/]' \| \
+	 X"$am_mf" : 'X\(//\)$' \| \
+	 X"$am_mf" : 'X\(/\)' \| . 2>/dev/null ||
+$as_echo X"$am_mf" |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -1009,53 +1015,48 @@ $as_echo X"$mf" |
 	    q
 	  }
 	  s/.*/./; q'`
-    else
-      continue
-    fi
-    # Extract the definition of DEPDIR, am__include, and am__quote
-    # from the Makefile without running 'make'.
-    DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
-    test -z "$DEPDIR" && continue
-    am__include=`sed -n 's/^am__include = //p' < "$mf"`
-    test -z "$am__include" && continue
-    am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
-    # Find all dependency output files, they are included files with
-    # $(DEPDIR) in their names.  We invoke sed twice because it is the
-    # simplest approach to changing $(DEPDIR) to its actual value in the
-    # expansion.
-    for file in `sed -n "
-      s/^$am__include $am__quote\(.*(DEPDIR).*\)$am__quote"'$/\1/p' <"$mf" | \
-	 sed -e 's/\$(DEPDIR)/'"$DEPDIR"'/g'`; do
-      # Make sure the directory exists.
-      test -f "$dirpart/$file" && continue
-      fdir=`$as_dirname -- "$file" ||
-$as_expr X"$file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$file" : 'X\(//\)[^/]' \| \
-	 X"$file" : 'X\(//\)$' \| \
-	 X"$file" : 'X\(/\)' \| . 2>/dev/null ||
-$as_echo X"$file" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+    am_filepart=`$as_basename -- "$am_mf" ||
+$as_expr X/"$am_mf" : '.*/\([^/][^/]*\)/*$' \| \
+	 X"$am_mf" : 'X\(//\)$' \| \
+	 X"$am_mf" : 'X\(/\)' \| . 2>/dev/null ||
+$as_echo X/"$am_mf" |
+    sed '/^.*\/\([^/][^/]*\)\/*$/{
 	    s//\1/
 	    q
 	  }
-	  /^X\(\/\/\)[^/].*/{
+	  /^X\/\(\/\/\)$/{
 	    s//\1/
 	    q
 	  }
-	  /^X\(\/\/\)$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\).*/{
+	  /^X\/\(\/\).*/{
 	    s//\1/
 	    q
 	  }
 	  s/.*/./; q'`
-      as_dir=$dirpart/$fdir; as_fn_mkdir_p
-      # echo "creating $dirpart/$file"
-      echo '# dummy' > "$dirpart/$file"
-    done
+    { echo "$as_me:$LINENO: cd "$am_dirpart" \
+      && sed -e '/# am--include-marker/d' "$am_filepart" \
+        | $MAKE -f - am--depfiles" >&5
+   (cd "$am_dirpart" \
+      && sed -e '/# am--include-marker/d' "$am_filepart" \
+        | $MAKE -f - am--depfiles) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); } || am_rc=$?
   done
+  if test $am_rc -ne 0; then
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Something went wrong bootstrapping makefile fragments
+    for automatic dependency tracking.  Try re-running configure with the
+    '--disable-dependency-tracking' option to at least be able to build
+    the package (albeit without support for automatic dependency tracking).
+See \`config.log' for more details" "$LINENO" 5; }
+  fi
+  { am_dirpart=; unset am_dirpart;}
+  { am_filepart=; unset am_filepart;}
+  { am_mf=; unset am_mf;}
+  { am_rc=; unset am_rc;}
+  rm -f conftest-deps.mk
 }
  ;;
 
