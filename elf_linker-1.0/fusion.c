@@ -1,4 +1,4 @@
-#include "brain.h"
+#include "elf_dumper.c"
 
 Elf32_Ehdr header;
 Elf32_Shdr section;
@@ -28,14 +28,19 @@ int main(int argc, char *argv[])
 //le header a ecrire dans le fichier se fait a la toute fin
    fread(&headerfile1,1, sizeof(header), elffile1);
    fread(&headerfile2,1, sizeof(header), elffile2);
+   fwrite(&headerfile1, 1, sizeof(header),elffileout);
    for (int i = 0; i < headerfile1.e_shnum; i++){ //on parcours les sections du fichier 1
      fseek(elffile1, headerfile1.e_shoff + i* sizeof(section), SEEK_SET);
      fread(&sectionfile1, 1 , sizeof (section), elffile1);
      for (int j = 0; j < headerfile2.e_shnum; j++){ //on parcours les sections du fichier 2
        fseek(elffile2, headerfile2.e_shoff + i* sizeof(section), SEEK_SET);
        fread(&sectionfile2, 1 , sizeof (section), elffile2);
-       if (sectionfile1.sh_type == sectionfile2.sh_type ){ //faut faire un test ici pour comparer les noms (pas les types) des sections
+       if (sectionfile1.sh_type == 1 && sectionfile2.sh_type == 1){ //faut faire un test ici pour comparer les noms (pas les types) des sections
          if (sectionfile1.sh_name == sectionfile2.sh_name){
+           //dump_section(elffile1, headerfile1, sectionfile1);
+           //dump_section(elffile2, headerfile2, sectionfile2);
+           //etape3(elffile1, i, sectionfile1, headerfile1);
+           //etape3(elffile2, j, sectionfile2, headerfile2);
            fseek(elffileout,headerfileout.e_shoff + i* sizeof(section),SEEK_SET );
            fwrite(&sectionfile1,1, sizeof(section), elffileout);
            fwrite(&sectionfile2,1, sizeof(section), elffileout);
@@ -51,4 +56,3 @@ int main(int argc, char *argv[])
      }
    }
 }
-
