@@ -5,7 +5,7 @@
 Elf32_Sym symb;
 Elf32_Rela rela;
 Elf32_Rel rel;
-char *sec_names = NULL;
+char sec_names[100];
 char *symb_names = NULL;
 
 void header_to_little_endian(Elf32_Ehdr *header)
@@ -942,9 +942,8 @@ void surf_sections(Elf32_Shdr *section)
 void get_section_names(FILE *file,Elf32_Shdr section)
 {
   	//Lire les noms of sections
-     sec_names = malloc(section.sh_size);
    fseek(file, section.sh_offset, SEEK_SET);
-   fread(sec_names, 1, section.sh_size, file);
+   fread(&sec_names, 1, section.sh_size, file);
    
 }
 void etape1(FILE *f,Elf32_Ehdr *header)
@@ -966,6 +965,80 @@ void etape1(FILE *f,Elf32_Ehdr *header)
    get_e_shentsize(&header);
    get_e_shnum(&header);
    get_e_shstrndx(&header);*/
+}
+void dump_section(FILE *f,Elf32_Ehdr header,Elf32_Shdr section){
+printf("\n--- NEW SECTION ---\n");
+   printf("Nom:\t%s \nTaille:\t%d\n",   section.sh_name[sec_names], section.sh_size);
+   printf("Type:\t");
+   
+   switch (section.sh_type)
+   {
+      case 0x0:
+         printf("NULL");
+         break;
+      case 0x1:
+         printf("PROGBITS");
+         break;
+      case 0x2:
+         printf("SYMTAB");
+         break;
+      case 0x3:
+         printf("STRTAB");
+         break;
+      case 0x4:
+         printf("RELA");
+         break;
+      case 0x5:
+         printf("HASH");
+         break;
+      case 0x6:
+         printf("DYNAMIC");
+         break;
+      case 0x7:
+         printf("NOTE");
+         break;
+      case 0x8:
+         printf("NOBITS");
+         break;
+      case 0x9:
+         printf("REL");
+         break;
+      case 0x0A:
+         printf("SHLIB");
+         break;
+
+      default:
+         printf("Type inconnu");
+         break;
+   }
+   printf("\n");
+   printf("Properties (flag %lx) : ", section.sh_flags);
+  	//Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#Section_header
+   if (section.sh_flags &SHF_WRITE)
+      printf("W");
+   if (section.sh_flags &SHF_ALLOC)
+      printf("A");
+   if (section.sh_flags &SHF_EXECINSTR)
+      printf("X");
+   if (section.sh_flags &SHF_MERGE)
+      printf("M");
+   if (section.sh_flags &SHF_STRINGS)
+      printf("S");
+   if (section.sh_flags &SHF_INFO_LINK)
+      printf("I");
+   if (section.sh_flags &SHF_LINK_ORDER)
+      printf("L");
+   if (section.sh_flags &SHF_OS_NONCONFORMING)
+      printf("O");
+   if (section.sh_flags &SHF_GROUP)
+      printf("G");
+   if (section.sh_flags &SHF_TLS)
+      printf("T");
+   if (section.sh_flags &SHF_EXCLUDE)
+      printf("E");
+   printf("\n");
+   printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
+   
 }
 //ndx=0x1 pour afficher que les PROGBITS
 void dump_sections(FILE *file,Elf32_Ehdr header,Elf32_Shdr section,Elf32_Word special_ndx,Elf32_Shdr *secs)
@@ -1071,7 +1144,7 @@ void etape3(FILE *f, int x,Elf32_Shdr section,Elf32_Ehdr header)
    unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
   	//TODO: Show section name:
-  printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
+  printf("\nVidange hexadécimale de la section « %s » :\n", sec_names );
    int j, k;
    int printed_smth = 0;
    fseek(f, section.sh_offset, SEEK_SET);

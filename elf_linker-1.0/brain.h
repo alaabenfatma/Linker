@@ -17,6 +17,7 @@
 #define bswap_64(x) ((unsigned int)__builtin_bswap64(x))
 int ENDIAN = 0; //var globale => 0 = little | 1 = bug
 //Etape 1 interfaces
+void dump_section(FILE *f,Elf32_Ehdr header,Elf32_Shdr section);
 void dump_sections(FILE *file,Elf32_Ehdr header,Elf32_Shdr section,Elf32_Word special_ndx,Elf32_Shdr *secs);
 void etape1(FILE *f,Elf32_Ehdr *header);
 void etape2(FILE *f,Elf32_Ehdr *header);
