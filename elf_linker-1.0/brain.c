@@ -1170,14 +1170,14 @@ int get_tab_symb(FILE *file, int i)
    get_tab_symb(file, i+1);
  }
 
-char* get_func_name(FILE* f, Elf32_Ehdr header, int sh_link, int st_name){
+char* get_func_name(FILE* f){
       Elf32_Shdr sec;
       int pos = ftell(f);
       char* name = malloc(10*sizeof(char));
-      fseek(f, header.e_shoff+sh_link*header.e_shentsize,SEEK_SET);
+      fseek(f, header.e_shoff+section.sh_link*header.e_shentsize,SEEK_SET);
       fread(&sec, 1, sizeof(sec), f);
       section_to_little_endian();
-      fseek(f,sec.sh_offset+st_name,SEEK_SET);
+      fseek(f,sec.sh_offset+symb.st_name,SEEK_SET);
       char c = fgetc(f);
       int i=0;
       while(c!='\0' && i<10){
@@ -1269,7 +1269,7 @@ void etape4(FILE *file)
       double st = symb.st_name;
       double sh = section.sh_link;
       
-            printf("Nom: %s \n",get_func_name(file, header, sh, st));
+            printf("Nom: %s \n",get_func_name(file));
             
       
 
