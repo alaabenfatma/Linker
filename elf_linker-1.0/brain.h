@@ -1,9 +1,12 @@
+#ifndef BRAIN_H_   
+#define BRAIN_H_
+
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <elf.h>
-#include <byteswap.h>
+#include "elf.h"
 #include "util.h"
 
 #define HEXA 16
@@ -15,7 +18,7 @@
 #define bswap_16(x) ((unsigned int)__builtin_bswap16(x))
 #define bswap_32(x) ((unsigned int)__builtin_bswap32(x))
 #define bswap_64(x) ((unsigned int)__builtin_bswap64(x))
-int ENDIAN = 0; //var globale => 0 = little | 1 = bug
+
 //Etape 1 interfaces
 void dump_sections(FILE *file, int i);
 void etape1(FILE *f);
@@ -54,6 +57,7 @@ void section_to_little_endian();
 void surf_sections();
 void symbol_to_little_endian();
 void type_fichier();
+int has_multiple_declarations(FILE* f1, FILE* f2);
 //Etape 2 interfaces
 typedef struct{
     Elf32_Ehdr header1;
@@ -63,3 +67,6 @@ typedef struct{
     Elf32_Shdr section1;
     Elf32_Shdr section2;
 }FusedSection;
+
+
+#endif // BRAIN_H_
