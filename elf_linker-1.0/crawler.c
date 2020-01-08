@@ -15,18 +15,21 @@ int sec_2_count;
 int ndx = 1;
 char *sec_names = NULL;
 char *symb_names = NULL;
-typedef struct {
-      Elf32_Shdr *sections;
-      int count;
-}sections_container;
+typedef struct
+{
+   Elf32_Shdr *sections;
+   int count;
+} sections_container;
 sections_container container;
-void append_section(){
-      container.sections[container.count] = section;
-      (container.count)++;
+void append_section()
+{
+   container.sections[container.count] = section;
+   (container.count)++;
 }
 void header_to_little_endian(Elf32_Ehdr *header)
 {
-      if(ENDIAN==1){
+   if (ENDIAN == 1)
+   {
       header->e_flags = reverse_4(header->e_flags);
       header->e_ehsize = reverse_2(header->e_ehsize);
       header->e_machine = reverse_2(header->e_machine);
@@ -39,45 +42,58 @@ void header_to_little_endian(Elf32_Ehdr *header)
       header->e_shstrndx = reverse_2(header->e_shstrndx);
       header->e_type = reverse_2(header->e_type);
       header->e_version = reverse_4(header->e_version);
-      header->e_entry = reverse_4(header->e_entry);}
+      header->e_entry = reverse_4(header->e_entry);
+   }
 }
-void section_to_little_endian(Elf32_Shdr *section){
-   if(ENDIAN==1){
-   section->sh_name = reverse_4(section->sh_name);
-   section->sh_type = reverse_4(section->sh_type);
-   section->sh_flags = reverse_4(section->sh_flags);
-   section->sh_addr = reverse_4(section->sh_addr);
-   section->sh_offset = reverse_4(section->sh_offset);
-   section->sh_size = reverse_4(section->sh_size);
-   section->sh_link = reverse_4(section->sh_link);
-   section->sh_info = reverse_4(section->sh_info);
-   section->sh_addralign = reverse_4(section->sh_addralign);
-   section->sh_entsize = reverse_4(section->sh_entsize);}
+void section_to_little_endian(Elf32_Shdr *section)
+{
+   if (ENDIAN == 1)
+   {
+      section->sh_name = reverse_4(section->sh_name);
+      section->sh_type = reverse_4(section->sh_type);
+      section->sh_flags = reverse_4(section->sh_flags);
+      section->sh_addr = reverse_4(section->sh_addr);
+      section->sh_offset = reverse_4(section->sh_offset);
+      section->sh_size = reverse_4(section->sh_size);
+      section->sh_link = reverse_4(section->sh_link);
+      section->sh_info = reverse_4(section->sh_info);
+      section->sh_addralign = reverse_4(section->sh_addralign);
+      section->sh_entsize = reverse_4(section->sh_entsize);
+   }
 }
 
-void symbol_to_little_endian(){
-   if(ENDIAN==1){
-   symb.st_name = reverse_2(symb.st_name);
-   symb.st_value = reverse_2(symb.st_value);
-   symb.st_size = reverse_2(symb.st_size);
-   /*
+void symbol_to_little_endian()
+{
+   if (ENDIAN == 1)
+   {
+      symb.st_name = reverse_2(symb.st_name);
+      symb.st_value = reverse_2(symb.st_value);
+      symb.st_size = reverse_2(symb.st_size);
+      /*
    These are already in unsigned char, can't be swapped.
    symb.st_info = reverse_4(symb.st_info);
    symb.st_other = reverse_4(symb.st_other);*/
-   symb.st_shndx = reverse_2(symb.st_shndx);}
+      symb.st_shndx = reverse_2(symb.st_shndx);
+   }
 }
 
-void rela_to_little_endian(){
-   if(ENDIAN==1){
-   rela.r_offset = reverse_4(rela.r_offset);
-   rela.r_info = reverse_4(rela.r_info);
-   rela.r_addend = reverse_4(rela.r_addend);}
+void rela_to_little_endian()
+{
+   if (ENDIAN == 1)
+   {
+      rela.r_offset = reverse_4(rela.r_offset);
+      rela.r_info = reverse_4(rela.r_info);
+      rela.r_addend = reverse_4(rela.r_addend);
+   }
 }
 
-void rel_to_little_endian(){
-   if(ENDIAN==1){
-   rel.r_offset = reverse_4(rel.r_offset);
-   rel.r_info = reverse_4(rel.r_info);}
+void rel_to_little_endian()
+{
+   if (ENDIAN == 1)
+   {
+      rel.r_offset = reverse_4(rel.r_offset);
+      rel.r_info = reverse_4(rel.r_info);
+   }
 }
 
 void load_data(FILE *file)
@@ -171,38 +187,38 @@ void get_os()
 {
    switch (header.e_ident[7])
    {
-      case 0x0:
-         printf("OS/ABI: UNIX System V");
-         break;
-      case 0x1:
-         printf("OS/ABI: HP-UX");
-         break;
-      case 0x2:
-         printf("OS/ABI: NetBSD");
-         break;
-      case 0x3:
-         printf("OS/ABI: Linux");
-         break;
-      case 0x4:
-         printf("OS/ABI: Linux");
-         break;
-      case 0x5:
-         printf("OS/ABI: IRIX");
-         break;
-      case 0x6:
-         printf("OS/ABI: FreeBSD");
-         break;
-      case 0x7:
-         printf("OS/ABI: UNIX TRU64");
-         break;
-      case 0x8:
-         printf("OS/ABI: de l'architecture ARM");
-         break;
-      case 0x9:
-         printf("OS/ABI: autonome (embarqué)");
-         break;
-      default:
-         break;
+   case 0x0:
+      printf("OS/ABI: UNIX System V");
+      break;
+   case 0x1:
+      printf("OS/ABI: HP-UX");
+      break;
+   case 0x2:
+      printf("OS/ABI: NetBSD");
+      break;
+   case 0x3:
+      printf("OS/ABI: Linux");
+      break;
+   case 0x4:
+      printf("OS/ABI: Linux");
+      break;
+   case 0x5:
+      printf("OS/ABI: IRIX");
+      break;
+   case 0x6:
+      printf("OS/ABI: FreeBSD");
+      break;
+   case 0x7:
+      printf("OS/ABI: UNIX TRU64");
+      break;
+   case 0x8:
+      printf("OS/ABI: de l'architecture ARM");
+      break;
+   case 0x9:
+      printf("OS/ABI: autonome (embarqué)");
+      break;
+   default:
+      break;
    }
    printf("\n");
 }
@@ -215,21 +231,21 @@ void type_fichier()
    printf("Type: ");
    switch (header.e_type)
    {
-      case 0x0:
-         printf("Type inconnu");
-         break;
-      case 0x1:
-         printf("REL");
-         break;
-      case 0x2:
-         printf("EXEC");
-         break;
-      case 0x3:
-         printf("DYN");
-         break;
-      case 0x4:
-         printf("CORE");
-         break;
+   case 0x0:
+      printf("Type inconnu");
+      break;
+   case 0x1:
+      printf("REL");
+      break;
+   case 0x2:
+      printf("EXEC");
+      break;
+   case 0x3:
+      printf("DYN");
+      break;
+   case 0x4:
+      printf("CORE");
+      break;
    }
    printf("\n");
 }
@@ -239,540 +255,540 @@ void get_machine()
    printf("Machine : ");
    switch (header.e_machine)
    {
-      case 0:
-         printf("No machine");
-         break;
-      case 1:
-         printf("AT&T WE 32100");
-         break;
-      case 2:
-         printf("SUN SPARC");
-         break;
-      case 3:
-         printf("Intel 80386");
-         break;
-      case 4:
-         printf("Motorola m68k family ");
-         break;
-      case 5:
-         printf("Motorola m88k family");
-         break;
-      case 6:
-         printf("Intel MCU");
-         break;
-      case 7:
-         printf("Intel 80860");
-         break;
-      case 8:
-         printf("MIPS R3000 big-endian");
-         break;
-      case 9:
-         printf("IBM System/370");
-         break;
-      case 10:
-         printf("MIPS R3000 little-endian");
-         break;
-      case 15:
-         printf("HPPA");
-         break;
-      case 17:
-         printf("Fujitsu VPP500");
-         break;
-      case 18:
-         printf("Sun's v8plus");
-         break;
-      case 19:
-         printf("Intel 80960");
-         break;
-      case 20:
-         printf("PowerPC");
-         break;
-      case 21:
-         printf("PowerPC 64-bit");
-         break;
-      case 22:
-         printf("IBM S390");
-         break;
-      case 23:
-         printf("IBM SPU/SPC");
-         break;
-      case 36:
-         printf("NEC V800 series");
-         break;
-      case 37:
-         printf("Fujitsu FR20");
-         break;
-      case 38:
-         printf("TRW RH-32");
-         break;
-      case 39:
-         printf("Motorola RCE");
-         break;
-      case 40:
-         printf("ARM");
-         break;
-      case 42:
-         printf("Hitachi SH");
-         break;
-      case 41:
-         printf("Digital Alpha");
-         break;
-      case 43:
-         printf("SPARC v9 64-bit");
-         break;
-      case 44:
-         printf("Siemens Tricore");
-         break;
-      case 45:
-         printf("Argonaut RISC Core");
-         break;
-      case 46:
-         printf("Hitachi H8/300");
-         break;
-      case 47:
-         printf("Hitachi H8/300H");
-         break;
-      case 48:
-         printf("Hitachi H8S");
-         break;
-      case 49:
-         printf("Hitachi H8/500");
-         break;
-      case 50:
-         printf("Intel Merced");
-         break;
-      case 51:
-         printf("Stanford MIPS-X");
-         break;
-      case 52:
-         printf("Motorola Coldfire");
-         break;
-      case 53:
-         printf("Motorola M68HC12");
-         break;
-      case 54:
-         printf("Fujitsu MMA Multimedia Accelerator");
-         break;
-      case 55:
-         printf("Siemens PCP");
-         break;
-      case 56:
-         printf("Sony nCPU embeeded RISC");
-         break;
-      case 57:
-         printf("Denso NDR1 microprocessor");
-         break;
-      case 58:
-         printf("Motorola Start*Core processor");
-         break;
-      case 59:
-         printf("Toyota ME16 processor");
-         break;
-      case 60:
-         printf("STMicroelectronic ST100 processor");
-         break;
-      case 61:
-         printf("Advanced Logic Corp. Tinyj emb.fam");
-         break;
-      case 62:
-         printf("AMD x86-64 architecture");
-         break;
-      case 63:
-         printf("Sony DSP Processor");
-         break;
-      case 64:
-         printf("Digital PDP-10");
-         break;
-      case 65:
-         printf("Digital PDP-11");
-         break;
-      case 66:
-         printf("Siemens FX66 microcontroller");
-         break;
-      case 67:
-         printf("STMicroelectronics ST9+ 8/16 mc");
-         break;
-      case 68:
-         printf("STmicroelectronics ST7 8 bit mc");
-         break;
-      case 69:
-         printf("Motorola MC68HC16 microcontroller");
-         break;
-      case 70:
-         printf("Motorola MC68HC11 microcontroller");
-         break;
-      case 71:
-         printf("Motorola MC68HC08 microcontroller");
-         break;
-      case 72:
-         printf("Motorola MC68HC05 microcontroller");
-         break;
-      case 73:
-         printf("Silicon Graphics SVx");
-         break;
-      case 74:
-         printf("STMicroelectronics ST19 8 bit mc");
-         break;
-      case 75:
-         printf("Digital VAX");
-         break;
-      case 76:
-         printf("Axis Communications 32-bit emb.proc");
-         break;
-      case 77:
-         printf("Infineon Technologies 32-bit emb.proc");
-         break;
-      case 78:
-         printf("Element 14 64-bit DSP Processor");
-         break;
-      case 79:
-         printf("LSI Logic 16-bit DSP Processor");
-         break;
-      case 80:
-         printf("Donald Knuth's educational 64-bit proc");
-         break;
-      case 81:
-         printf("Harvard University machine-independent object files");
-         break;
-      case 82:
-         printf("SiTera Prism");
-         break;
-      case 83:
-         printf("Atmel AVR 8-bit microcontroller");
-         break;
-      case 84:
-         printf("Fujitsu FR30");
-         break;
-      case 85:
-         printf("Mitsubishi D10V");
-         break;
-      case 86:
-         printf("Mitsubishi D30V");
-         break;
-      case 87:
-         printf("NEC v850");
-         break;
-      case 88:
-         printf("Mitsubishi M32R");
-         break;
-      case 89:
-         printf("Matsushita MN10300");
-         break;
-      case 90:
-         printf("Matsushita MN10200");
-         break;
-      case 91:
-         printf("picoJava");
-         break;
-      case 92:
-         printf("OpenRISC 32-bit embedded processor");
-         break;
-      case 93:
-         printf("ARC International ARCompact");
-         break;
-      case 94:
-         printf("Tensilica Xtensa Architecture");
-         break;
-      case 95:
-         printf("Alphamosaic VideoCore");
-         break;
-      case 96:
-         printf("Thompson Multimedia General Purpose Proc");
-         break;
-      case 97:
-         printf("National Semi. 32000");
-         break;
-      case 98:
-         printf("Tenor Network TPC");
-         break;
-      case 99:
-         printf("Trebia SNP 1000");
-         break;
-      case 100:
-         printf("STMicroelectronics ST200");
-         break;
-      case 101:
-         printf("Ubicom IP2xxx");
-         break;
-      case 102:
-         printf("MAX processor");
-         break;
-      case 103:
-         printf("National Semi. CompactRISC");
-         break;
-      case 104:
-         printf("Fujitsu F2MC16");
-         break;
-      case 105:
-         printf("Texas Instruments msp430");
-         break;
-      case 106:
-         printf("Analog Devices Blackfin DSP");
-         break;
-      case 107:
-         printf("Seiko Epson S1C33 family");
-         break;
-      case 108:
-         printf("Sharp embedded microprocessor");
-         break;
-      case 109:
-         printf("Arca RISC");
-         break;
-      case 110:
-         printf("PKU-Unity &MPRC Peking Uni. mc series");
-         break;
-      case 111:
-         printf("eXcess configurable cpu");
-         break;
-      case 112:
-         printf("Icera Semi. Deep Execution Processor");
-         break;
-      case 113:
-         printf("Altera Nios II");
-         break;
-      case 114:
-         printf("National Semi. CompactRISC CRX");
-         break;
-      case 115:
-         printf("Motorola XGATE");
-         break;
-      case 116:
-         printf("Infineon C16x/XC16x");
-         break;
-      case 117:
-         printf("Renesas M16C");
-         break;
-      case 118:
-         printf("Microchip Technology dsPIC30F");
-         break;
-      case 119:
-         printf("Freescale Communication Engine RISC");
-         break;
-      case 120:
-         printf("Renesas M32C");
-         break;
-      case 131:
-         printf("Altium TSK3000");
-         break;
-      case 132:
-         printf("Freescale RS08");
-         break;
-      case 133:
-         printf("Analog Devices SHARC family");
-         break;
-      case 134:
-         printf("Cyan Technology eCOG2");
-         break;
-      case 135:
-         printf("Sunplus S+core7 RISC");
-         break;
-      case 136:
-         printf("New Japan Radio (NJR) 24-bit DSP");
-         break;
-      case 137:
-         printf("Broadcom VideoCore III");
-         break;
-      case 138:
-         printf("RISC for Lattice FPGA");
-         break;
-      case 139:
-         printf("Seiko Epson C17");
-         break;
-      case 140:
-         printf("Texas Instruments TMS320C6000 DSP");
-         break;
-      case 141:
-         printf("Texas Instruments TMS320C2000 DSP");
-         break;
-      case 142:
-         printf("Texas Instruments TMS320C55x DSP");
-         break;
-      case 143:
-         printf("Texas Instruments App. Specific RISC");
-         break;
-      case 144:
-         printf("Texas Instruments Prog. Realtime Unit");
-         break;
-      case 160:
-         printf("STMicroelectronics 64bit VLIW DSP");
-         break;
-      case 161:
-         printf("Cypress M8C");
-         break;
-      case 162:
-         printf("Renesas R32C");
-         break;
-      case 163:
-         printf("NXP Semi. TriMedia");
-         break;
-      case 164:
-         printf("QUALCOMM DSP6");
-         break;
-      case 166:
-         printf("STMicroelectronics STxP7x");
-         break;
-      case 165:
-         printf("Intel 8051 and variants");
-         break;
-      case 167:
-         printf("Andes Tech. compact code emb. RISC");
-         break;
-      case 168:
-         printf("Cyan Technology eCOG1X");
-         break;
-      case 169:
-         printf("Dallas Semi. MAXQ30 mc");
-         break;
-      case 170:
-         printf("New Japan Radio (NJR) 16-bit DSP");
-         break;
-      case 171:
-         printf("M2000 Reconfigurable RISC");
-         break;
-      case 172:
-         printf("Cray NV2 vector architecture");
-         break;
-      case 173:
-         printf("Renesas RX");
-         break;
-      case 174:
-         printf("Imagination Tech. META");
-         break;
-      case 175:
-         printf("MCST Elbrus");
-         break;
-      case 176:
-         printf("Cyan Technology eCOG16");
-         break;
-      case 177:
-         printf("National Semi. CompactRISC CR16");
-         break;
-      case 178:
-         printf("Freescale Extended Time Processing Unit");
-         break;
-      case 179:
-         printf("Infineon Tech. SLE9X");
-         break;
-      case 180:
-         printf("Intel L10M");
-         break;
-      case 181:
-         printf("Intel K10M");
-         break;
-      case 183:
-         printf("ARM AARCH64");
-         break;
-      case 185:
-         printf("Amtel 32-bit microprocessor");
-         break;
-      case 186:
-         printf("STMicroelectronics STM8");
-         break;
-      case 187:
-         printf("Tileta TILE64");
-         break;
-      case 188:
-         printf("Tilera TILEPro");
-         break;
-      case 189:
-         printf("Xilinx MicroBlaze");
-         break;
-      case 190:
-         printf("NVIDIA CUDA");
-         break;
-      case 191:
-         printf("Tilera TILE-Gx");
-         break;
-      case 192:
-         printf("CloudShield");
-         break;
-      case 193:
-         printf("KIPO-KAIST Core-A 1st gen.");
-         break;
-      case 194:
-         printf("KIPO-KAIST Core-A 2nd gen.");
-         break;
-      case 195:
-         printf("Synopsys ARCompact V2");
-         break;
-      case 196:
-         printf("Open8 RISC");
-         break;
-      case 197:
-         printf("Renesas RL78");
-         break;
-      case 198:
-         printf("Broadcom VideoCore V");
-         break;
-      case 199:
-         printf("Renesas 78KOR");
-         break;
-      case 200:
-         printf("Freescale 56800EX DSC");
-         break;
-      case 201:
-         printf("Beyond BA1");
-         break;
-      case 202:
-         printf("Beyond BA2");
-         break;
-      case 203:
-         printf("XMOS xCORE");
-         break;
-      case 204:
-         printf("Microchip 8-bit PIC(r)");
-         break;
-      case 210:
-         printf("KM211 KM32");
-         break;
-      case 211:
-         printf("KM211 KMX32");
-         break;
-      case 212:
-         printf("KM211 KMX16");
-         break;
-      case 213:
-         printf("KM211 KMX8");
-         break;
-      case 214:
-         printf("KM211 KVARC");
-         break;
-      case 215:
-         printf("Paneve CDP");
-         break;
-      case 216:
-         printf("Cognitive Smart Memory Processor");
-         break;
-      case 217:
-         printf("Bluechip CoolEngine");
-         break;
-      case 218:
-         printf("Nanoradio Optimized RISC");
-         break;
-      case 219:
-         printf("CSR Kalimba");
-         break;
-      case 220:
-         printf("Zilog Z80");
-         break;
-      case 221:
-         printf("Controls and Data Services VISIUMcore");
-         break;
-      case 222:
-         printf("FTDI Chip FT32");
-         break;
-      case 223:
-         printf("Moxie processor");
-         break;
-      case 224:
-         printf("AMD GPU");
-         break;
-      case 243:
-         printf("RISC-V");
-         break;
-      case 247:
-         printf("Linux BPF -- in-kernel virtual machine");
-         break;
+   case 0:
+      printf("No machine");
+      break;
+   case 1:
+      printf("AT&T WE 32100");
+      break;
+   case 2:
+      printf("SUN SPARC");
+      break;
+   case 3:
+      printf("Intel 80386");
+      break;
+   case 4:
+      printf("Motorola m68k family ");
+      break;
+   case 5:
+      printf("Motorola m88k family");
+      break;
+   case 6:
+      printf("Intel MCU");
+      break;
+   case 7:
+      printf("Intel 80860");
+      break;
+   case 8:
+      printf("MIPS R3000 big-endian");
+      break;
+   case 9:
+      printf("IBM System/370");
+      break;
+   case 10:
+      printf("MIPS R3000 little-endian");
+      break;
+   case 15:
+      printf("HPPA");
+      break;
+   case 17:
+      printf("Fujitsu VPP500");
+      break;
+   case 18:
+      printf("Sun's v8plus");
+      break;
+   case 19:
+      printf("Intel 80960");
+      break;
+   case 20:
+      printf("PowerPC");
+      break;
+   case 21:
+      printf("PowerPC 64-bit");
+      break;
+   case 22:
+      printf("IBM S390");
+      break;
+   case 23:
+      printf("IBM SPU/SPC");
+      break;
+   case 36:
+      printf("NEC V800 series");
+      break;
+   case 37:
+      printf("Fujitsu FR20");
+      break;
+   case 38:
+      printf("TRW RH-32");
+      break;
+   case 39:
+      printf("Motorola RCE");
+      break;
+   case 40:
+      printf("ARM");
+      break;
+   case 42:
+      printf("Hitachi SH");
+      break;
+   case 41:
+      printf("Digital Alpha");
+      break;
+   case 43:
+      printf("SPARC v9 64-bit");
+      break;
+   case 44:
+      printf("Siemens Tricore");
+      break;
+   case 45:
+      printf("Argonaut RISC Core");
+      break;
+   case 46:
+      printf("Hitachi H8/300");
+      break;
+   case 47:
+      printf("Hitachi H8/300H");
+      break;
+   case 48:
+      printf("Hitachi H8S");
+      break;
+   case 49:
+      printf("Hitachi H8/500");
+      break;
+   case 50:
+      printf("Intel Merced");
+      break;
+   case 51:
+      printf("Stanford MIPS-X");
+      break;
+   case 52:
+      printf("Motorola Coldfire");
+      break;
+   case 53:
+      printf("Motorola M68HC12");
+      break;
+   case 54:
+      printf("Fujitsu MMA Multimedia Accelerator");
+      break;
+   case 55:
+      printf("Siemens PCP");
+      break;
+   case 56:
+      printf("Sony nCPU embeeded RISC");
+      break;
+   case 57:
+      printf("Denso NDR1 microprocessor");
+      break;
+   case 58:
+      printf("Motorola Start*Core processor");
+      break;
+   case 59:
+      printf("Toyota ME16 processor");
+      break;
+   case 60:
+      printf("STMicroelectronic ST100 processor");
+      break;
+   case 61:
+      printf("Advanced Logic Corp. Tinyj emb.fam");
+      break;
+   case 62:
+      printf("AMD x86-64 architecture");
+      break;
+   case 63:
+      printf("Sony DSP Processor");
+      break;
+   case 64:
+      printf("Digital PDP-10");
+      break;
+   case 65:
+      printf("Digital PDP-11");
+      break;
+   case 66:
+      printf("Siemens FX66 microcontroller");
+      break;
+   case 67:
+      printf("STMicroelectronics ST9+ 8/16 mc");
+      break;
+   case 68:
+      printf("STmicroelectronics ST7 8 bit mc");
+      break;
+   case 69:
+      printf("Motorola MC68HC16 microcontroller");
+      break;
+   case 70:
+      printf("Motorola MC68HC11 microcontroller");
+      break;
+   case 71:
+      printf("Motorola MC68HC08 microcontroller");
+      break;
+   case 72:
+      printf("Motorola MC68HC05 microcontroller");
+      break;
+   case 73:
+      printf("Silicon Graphics SVx");
+      break;
+   case 74:
+      printf("STMicroelectronics ST19 8 bit mc");
+      break;
+   case 75:
+      printf("Digital VAX");
+      break;
+   case 76:
+      printf("Axis Communications 32-bit emb.proc");
+      break;
+   case 77:
+      printf("Infineon Technologies 32-bit emb.proc");
+      break;
+   case 78:
+      printf("Element 14 64-bit DSP Processor");
+      break;
+   case 79:
+      printf("LSI Logic 16-bit DSP Processor");
+      break;
+   case 80:
+      printf("Donald Knuth's educational 64-bit proc");
+      break;
+   case 81:
+      printf("Harvard University machine-independent object files");
+      break;
+   case 82:
+      printf("SiTera Prism");
+      break;
+   case 83:
+      printf("Atmel AVR 8-bit microcontroller");
+      break;
+   case 84:
+      printf("Fujitsu FR30");
+      break;
+   case 85:
+      printf("Mitsubishi D10V");
+      break;
+   case 86:
+      printf("Mitsubishi D30V");
+      break;
+   case 87:
+      printf("NEC v850");
+      break;
+   case 88:
+      printf("Mitsubishi M32R");
+      break;
+   case 89:
+      printf("Matsushita MN10300");
+      break;
+   case 90:
+      printf("Matsushita MN10200");
+      break;
+   case 91:
+      printf("picoJava");
+      break;
+   case 92:
+      printf("OpenRISC 32-bit embedded processor");
+      break;
+   case 93:
+      printf("ARC International ARCompact");
+      break;
+   case 94:
+      printf("Tensilica Xtensa Architecture");
+      break;
+   case 95:
+      printf("Alphamosaic VideoCore");
+      break;
+   case 96:
+      printf("Thompson Multimedia General Purpose Proc");
+      break;
+   case 97:
+      printf("National Semi. 32000");
+      break;
+   case 98:
+      printf("Tenor Network TPC");
+      break;
+   case 99:
+      printf("Trebia SNP 1000");
+      break;
+   case 100:
+      printf("STMicroelectronics ST200");
+      break;
+   case 101:
+      printf("Ubicom IP2xxx");
+      break;
+   case 102:
+      printf("MAX processor");
+      break;
+   case 103:
+      printf("National Semi. CompactRISC");
+      break;
+   case 104:
+      printf("Fujitsu F2MC16");
+      break;
+   case 105:
+      printf("Texas Instruments msp430");
+      break;
+   case 106:
+      printf("Analog Devices Blackfin DSP");
+      break;
+   case 107:
+      printf("Seiko Epson S1C33 family");
+      break;
+   case 108:
+      printf("Sharp embedded microprocessor");
+      break;
+   case 109:
+      printf("Arca RISC");
+      break;
+   case 110:
+      printf("PKU-Unity &MPRC Peking Uni. mc series");
+      break;
+   case 111:
+      printf("eXcess configurable cpu");
+      break;
+   case 112:
+      printf("Icera Semi. Deep Execution Processor");
+      break;
+   case 113:
+      printf("Altera Nios II");
+      break;
+   case 114:
+      printf("National Semi. CompactRISC CRX");
+      break;
+   case 115:
+      printf("Motorola XGATE");
+      break;
+   case 116:
+      printf("Infineon C16x/XC16x");
+      break;
+   case 117:
+      printf("Renesas M16C");
+      break;
+   case 118:
+      printf("Microchip Technology dsPIC30F");
+      break;
+   case 119:
+      printf("Freescale Communication Engine RISC");
+      break;
+   case 120:
+      printf("Renesas M32C");
+      break;
+   case 131:
+      printf("Altium TSK3000");
+      break;
+   case 132:
+      printf("Freescale RS08");
+      break;
+   case 133:
+      printf("Analog Devices SHARC family");
+      break;
+   case 134:
+      printf("Cyan Technology eCOG2");
+      break;
+   case 135:
+      printf("Sunplus S+core7 RISC");
+      break;
+   case 136:
+      printf("New Japan Radio (NJR) 24-bit DSP");
+      break;
+   case 137:
+      printf("Broadcom VideoCore III");
+      break;
+   case 138:
+      printf("RISC for Lattice FPGA");
+      break;
+   case 139:
+      printf("Seiko Epson C17");
+      break;
+   case 140:
+      printf("Texas Instruments TMS320C6000 DSP");
+      break;
+   case 141:
+      printf("Texas Instruments TMS320C2000 DSP");
+      break;
+   case 142:
+      printf("Texas Instruments TMS320C55x DSP");
+      break;
+   case 143:
+      printf("Texas Instruments App. Specific RISC");
+      break;
+   case 144:
+      printf("Texas Instruments Prog. Realtime Unit");
+      break;
+   case 160:
+      printf("STMicroelectronics 64bit VLIW DSP");
+      break;
+   case 161:
+      printf("Cypress M8C");
+      break;
+   case 162:
+      printf("Renesas R32C");
+      break;
+   case 163:
+      printf("NXP Semi. TriMedia");
+      break;
+   case 164:
+      printf("QUALCOMM DSP6");
+      break;
+   case 166:
+      printf("STMicroelectronics STxP7x");
+      break;
+   case 165:
+      printf("Intel 8051 and variants");
+      break;
+   case 167:
+      printf("Andes Tech. compact code emb. RISC");
+      break;
+   case 168:
+      printf("Cyan Technology eCOG1X");
+      break;
+   case 169:
+      printf("Dallas Semi. MAXQ30 mc");
+      break;
+   case 170:
+      printf("New Japan Radio (NJR) 16-bit DSP");
+      break;
+   case 171:
+      printf("M2000 Reconfigurable RISC");
+      break;
+   case 172:
+      printf("Cray NV2 vector architecture");
+      break;
+   case 173:
+      printf("Renesas RX");
+      break;
+   case 174:
+      printf("Imagination Tech. META");
+      break;
+   case 175:
+      printf("MCST Elbrus");
+      break;
+   case 176:
+      printf("Cyan Technology eCOG16");
+      break;
+   case 177:
+      printf("National Semi. CompactRISC CR16");
+      break;
+   case 178:
+      printf("Freescale Extended Time Processing Unit");
+      break;
+   case 179:
+      printf("Infineon Tech. SLE9X");
+      break;
+   case 180:
+      printf("Intel L10M");
+      break;
+   case 181:
+      printf("Intel K10M");
+      break;
+   case 183:
+      printf("ARM AARCH64");
+      break;
+   case 185:
+      printf("Amtel 32-bit microprocessor");
+      break;
+   case 186:
+      printf("STMicroelectronics STM8");
+      break;
+   case 187:
+      printf("Tileta TILE64");
+      break;
+   case 188:
+      printf("Tilera TILEPro");
+      break;
+   case 189:
+      printf("Xilinx MicroBlaze");
+      break;
+   case 190:
+      printf("NVIDIA CUDA");
+      break;
+   case 191:
+      printf("Tilera TILE-Gx");
+      break;
+   case 192:
+      printf("CloudShield");
+      break;
+   case 193:
+      printf("KIPO-KAIST Core-A 1st gen.");
+      break;
+   case 194:
+      printf("KIPO-KAIST Core-A 2nd gen.");
+      break;
+   case 195:
+      printf("Synopsys ARCompact V2");
+      break;
+   case 196:
+      printf("Open8 RISC");
+      break;
+   case 197:
+      printf("Renesas RL78");
+      break;
+   case 198:
+      printf("Broadcom VideoCore V");
+      break;
+   case 199:
+      printf("Renesas 78KOR");
+      break;
+   case 200:
+      printf("Freescale 56800EX DSC");
+      break;
+   case 201:
+      printf("Beyond BA1");
+      break;
+   case 202:
+      printf("Beyond BA2");
+      break;
+   case 203:
+      printf("XMOS xCORE");
+      break;
+   case 204:
+      printf("Microchip 8-bit PIC(r)");
+      break;
+   case 210:
+      printf("KM211 KM32");
+      break;
+   case 211:
+      printf("KM211 KMX32");
+      break;
+   case 212:
+      printf("KM211 KMX16");
+      break;
+   case 213:
+      printf("KM211 KMX8");
+      break;
+   case 214:
+      printf("KM211 KVARC");
+      break;
+   case 215:
+      printf("Paneve CDP");
+      break;
+   case 216:
+      printf("Cognitive Smart Memory Processor");
+      break;
+   case 217:
+      printf("Bluechip CoolEngine");
+      break;
+   case 218:
+      printf("Nanoradio Optimized RISC");
+      break;
+   case 219:
+      printf("CSR Kalimba");
+      break;
+   case 220:
+      printf("Zilog Z80");
+      break;
+   case 221:
+      printf("Controls and Data Services VISIUMcore");
+      break;
+   case 222:
+      printf("FTDI Chip FT32");
+      break;
+   case 223:
+      printf("Moxie processor");
+      break;
+   case 224:
+      printf("AMD GPU");
+      break;
+   case 243:
+      printf("RISC-V");
+      break;
+   case 247:
+      printf("Linux BPF -- in-kernel virtual machine");
+      break;
    }
 }
 
@@ -783,17 +799,17 @@ void get_e_version2()
 
 void get_e_entry()
 {
-   printf("Adresse du point d'entrée: 0x%lx \n", header.e_entry);
+   printf("Adresse du point d'entrée: 0x%x \n", header.e_entry);
 }
 
 void get_e_phoff()
 {
-   printf("Début des en-têtes de programme : %lx (octets dans le fichier)\n", header.e_phoff);
+   printf("Début des en-têtes de programme : %x (octets dans le fichier)\n", header.e_phoff);
 }
 
 void get_e_shoff()
 {
-   printf("Début des en-têtes de section : %li (octets dans le fichier)\n", header.e_shoff);
+   printf("Début des en-têtes de section : %i (octets dans le fichier)\n", header.e_shoff);
 }
 
 void get_e_flags()
@@ -841,112 +857,116 @@ void get_sh_type()
    printf("Type de la section: ");
    switch (section.sh_type)
    {
-      case 0:
-         printf("section header table entry unused");
-         break;
-      case 1:
-         printf("Program data");
-         break;
-      case 2:
-         printf("Symbol table");
-         break;
-      case 3:
-         printf("String table");
-         break;
-      case 4:
-         printf("Relocation entries with addends");
-         break;
-      case 5:
-         printf("Symbol hash table");
-         break;
-      case 6:
-         printf("Dynamic linking information");
-         break;
-      case 7:
-         printf("Notes");
-         break;
-      case 8:
-         printf("Program space with no data (bss)");
-         break;
-      case 9:
-         printf("Relocation entries, no addends");
-         break;
-      case 10:
-         printf("Reserved");
-         break;
-      case 11:
-         printf("Dynamic linker symbol table");
-         break;
-      case 14:
-         printf("Array of constructors");
-         break;
-      case 15:
-         printf("Array of destructors");
-         break;
-      case 16:
-         printf("Array of pre-constructors");
-         break;
-      case 17:
-         printf("section group ");
-         break;
-      case 18:
-         printf("Extended section indeces");
-         break;
-      case 19:
-         printf("Number of defined types.");
-         break;
-      case 0x60000000:
-         printf("Start OS-specific.");
-         break;
-      case 0x6ffffff5:
-         printf("Object attributes.");
-         break;
-      case 0x6ffffff6:
-         printf("GNU-style hash table.");
-         break;
-      case 0x6ffffff7:
-         printf("Prelink library list");
-         break;
-      case 0x6ffffff8:
-         printf("Checksum for DSO content.");
-         break;
-      case 0x6ffffffa:
-         printf("Sun-specific low bound.");
-         break;
-      case 0x6ffffffd:
-         printf("Version definition section.");
-         break;
-      case 0x6ffffffe:
-         printf("Version needs section.");
-         break;
-      case 0x6fffffff:
-         printf("Version symbol table.");
-         break;
-        	//case 0x6fffffff	: printf("Sun-specific high bound."); break;
-        	//case 0x6fffffff	: printf("End OS-specific type"); break;
-      case 0x70000000:
-         printf("Start of processor-specific");
-         break;
-      case 0x7fffffff:
-         printf("End of processor-specific");
-         break;
-      case 0x80000000:
-         printf("Start of application-specific");
-         break;
-      case 0x8fffffff:
-         printf("End of application-specific");
-         break;
-      default:
-         printf("ouin ouin");
-         break;
+   case 0:
+      printf("section header table entry unused");
+      break;
+   case 1:
+      printf("Program data");
+      break;
+   case 2:
+      printf("Symbol table");
+      break;
+   case 3:
+      printf("String table");
+      break;
+   case 4:
+      printf("Relocation entries with addends");
+      break;
+   case 5:
+      printf("Symbol hash table");
+      break;
+   case 6:
+      printf("Dynamic linking information");
+      break;
+   case 7:
+      printf("Notes");
+      break;
+   case 8:
+      printf("Program space with no data (bss)");
+      break;
+   case 9:
+      printf("Relocation entries, no addends");
+      break;
+   case 10:
+      printf("Reserved");
+      break;
+   case 11:
+      printf("Dynamic linker symbol table");
+      break;
+   case 14:
+      printf("Array of constructors");
+      break;
+   case 15:
+      printf("Array of destructors");
+      break;
+   case 16:
+      printf("Array of pre-constructors");
+      break;
+   case 17:
+      printf("section group ");
+      break;
+   case 18:
+      printf("Extended section indeces");
+      break;
+   case 19:
+      printf("Number of defined types.");
+      break;
+   case 0x60000000:
+      printf("Start OS-specific.");
+      break;
+   case 0x6ffffff5:
+      printf("Object attributes.");
+      break;
+   case 0x6ffffff6:
+      printf("GNU-style hash table.");
+      break;
+   case 0x6ffffff7:
+      printf("Prelink library list");
+      break;
+   case 0x6ffffff8:
+      printf("Checksum for DSO content.");
+      break;
+   case 0x6ffffffa:
+      printf("Sun-specific low bound.");
+      break;
+   case 0x6ffffffd:
+      printf("Version definition section.");
+      break;
+   case 0x6ffffffe:
+      printf("Version needs section.");
+      break;
+   case 0x6fffffff:
+      printf("Version symbol table.");
+      break;
+      //case 0x6fffffff	: printf("Sun-specific high bound."); break;
+      //case 0x6fffffff	: printf("End OS-specific type"); break;
+   case 0x70000000:
+      printf("Start of processor-specific");
+      break;
+   case 0x7fffffff:
+      printf("End of processor-specific");
+      break;
+   case 0x80000000:
+      printf("Start of application-specific");
+      break;
+   case 0x8fffffff:
+      printf("End of application-specific");
+      break;
+   default:
+      printf("ouin ouin");
+      break;
    }
 }
 void get_section_names(FILE *file)
 {
-  	//Lire les noms of sections
+   //Lire les noms of sections
    sec_names = malloc(section.sh_size);
    fseek(file, section.sh_offset, SEEK_SET);
-   fread(sec_names, 1, section.sh_size, file);
+   if (!fread(sec_names, 1, section.sh_size, file))
+   {
+      printf("Erreur fread");
+      exit(1);
+   }
 }
 void etape1(FILE *f)
 {
@@ -973,82 +993,87 @@ void dump_sections(FILE *file, int i)
 {
    if (i == header.e_shnum)
       return;
-   fseek(file, header.e_shoff + i* sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), file);
+   fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
+   if (!fread(&section, 1, sizeof(section), file))
+   {
+
+      printf("Erreur fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
 
    printf("\n--- NEW section ---\n");
-   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%lx\n", i, sec_names + section.sh_name, section.sh_size);
+   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
    printf("Type:\t");
    switch (section.sh_type)
    {
-      case 0x0:
-         printf("NULL");
-         break;
-      case 0x1:
-         printf("PROGBITS");
-         break;
-      case 0x2:
-         printf("SYMTAB");
-         break;
-      case 0x3:
-         printf("STRTAB");
-         break;
-      case 0x4:
-         printf("RELA");
-         break;
-      case 0x5:
-         printf("HASH");
-         break;
-      case 0x6:
-         printf("DYNAMIC");
-         break;
-      case 0x7:
-         printf("NOTE");
-         break;
-      case 0x8:
-         printf("NOBITS");
-         break;
-      case 0x9:
-         printf("REL");
-         break;
-      case 0x0A:
-         printf("SHLIB");
-         break;
+   case 0x0:
+      printf("NULL");
+      break;
+   case 0x1:
+      printf("PROGBITS");
+      break;
+   case 0x2:
+      printf("SYMTAB");
+      break;
+   case 0x3:
+      printf("STRTAB");
+      break;
+   case 0x4:
+      printf("RELA");
+      break;
+   case 0x5:
+      printf("HASH");
+      break;
+   case 0x6:
+      printf("DYNAMIC");
+      break;
+   case 0x7:
+      printf("NOTE");
+      break;
+   case 0x8:
+      printf("NOBITS");
+      break;
+   case 0x9:
+      printf("REL");
+      break;
+   case 0x0A:
+      printf("SHLIB");
+      break;
 
-      default:
-         printf("Type inconnu");
-         break;
+   default:
+      printf("Type inconnu");
+      break;
    }
    printf("\n");
-   printf("Properties (flag %lx) : ", section.sh_flags);
-  	//Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#section_header
-   if (section.sh_flags &SHF_WRITE)
+   printf("Properties (flag %x) : ", section.sh_flags);
+   //Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#section_header
+   if (section.sh_flags & SHF_WRITE)
       printf("W");
-   if (section.sh_flags &SHF_ALLOC)
+   if (section.sh_flags & SHF_ALLOC)
       printf("A");
-   if (section.sh_flags &SHF_EXECINSTR)
+   if (section.sh_flags & SHF_EXECINSTR)
       printf("X");
-   if (section.sh_flags &SHF_MERGE)
+   if (section.sh_flags & SHF_MERGE)
       printf("M");
-   if (section.sh_flags &SHF_STRINGS)
+   if (section.sh_flags & SHF_STRINGS)
       printf("S");
-   if (section.sh_flags &SHF_INFO_LINK)
+   if (section.sh_flags & SHF_INFO_LINK)
       printf("I");
-   if (section.sh_flags &SHF_LINK_ORDER)
+   if (section.sh_flags & SHF_LINK_ORDER)
       printf("L");
-   if (section.sh_flags &SHF_OS_NONCONFORMING)
+   if (section.sh_flags & SHF_OS_NONCONFORMING)
       printf("O");
-   if (section.sh_flags &SHF_GROUP)
+   if (section.sh_flags & SHF_GROUP)
       printf("G");
-   if (section.sh_flags &SHF_TLS)
+   if (section.sh_flags & SHF_TLS)
       printf("T");
-   if (section.sh_flags &SHF_EXCLUDE)
+   if (section.sh_flags & SHF_EXCLUDE)
       printf("E");
    printf("\n");
-   printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
+   printf("Position of section (en octets) :\t%o\n", section.sh_offset);
    printf("The section will be written in a file");
- 
+
    dump_sections(file, i + 1);
 }
 void etape2(FILE *f)
@@ -1059,17 +1084,22 @@ void etape2(FILE *f)
 void etape3(FILE *f, int x)
 {
 
-   fseek(f, header.e_shoff + x* sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), f);
+   fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
+   if (!fread(&section, 1, sizeof(section), f))
+   {
+
+      printf("Erreur fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
    unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
-  	//TODO: Show section name:
+   //TODO: Show section name:
    printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
    int j, k;
    int printed_smth = 0;
    fseek(f, section.sh_offset, SEEK_SET);
-  	// Process every byte in the data of the section.
+   // Process every byte in the data of the section.
    int i = 0;
    int counter = i;
    while (i < section.sh_size)
@@ -1084,7 +1114,11 @@ void etape3(FILE *f, int x)
             if (i / 16 < section.sh_size)
             {
 
-               fread(buff, sizeof(*buff), 1, f);
+               if (!fread(buff, sizeof(*buff), 1, f))
+               {
+                  printf("Erreur fread");
+                  exit(1);
+               }
                printf("%02x", *buff);
                ASCII_DUMP[i / 16 % HEXA] = *buff;
                i += 16;
@@ -1092,7 +1126,7 @@ void etape3(FILE *f, int x)
             }
             else
             {
-              	//printf(" ");
+               //printf(" ");
             }
          }
          printf(" ");
@@ -1113,7 +1147,9 @@ void etape3(FILE *f, int x)
                printf("\n");
                printf("0x%08x ", i / 16);
             }
-            else {}
+            else
+            {
+            }
          }
       }
       if (counter > 0)
@@ -1125,7 +1161,6 @@ void etape3(FILE *f, int x)
                printf(".");
          }
    }
-     
 
    printf("\n");
 }
@@ -1133,110 +1168,186 @@ void etape3(FILE *f, int x)
 int get_tab_symb(FILE *file, int i)
 {
    if (i == header.e_shnum)
-      return;
-   fseek(file, header.e_shoff + i* sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), file);
+      return 0;
+   fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
+   if (!fread(&section, 1, sizeof(section), file))
+   {
+
+      printf("Erreur fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
    switch (section.sh_type)
    {
-      case 0x0:
-         break;
-      case 0x1:
-         break;
-      case 0x2:
-         return i;
-      case 0x3:
-         break;
-      case 0x4:
-         break;
-      case 0x5:
-         break;
-      case 0x6:
-         break;
-      case 0x7:
-         break;
-      case 0x8:
-         break;
-      case 0x9:
-         break;
-      case 0x0A:
-         break;
-      default:
-         break;
+   case 0x0:
+      break;
+   case 0x1:
+      break;
+   case 0x2:
+      return i;
+   case 0x3:
+      break;
+   case 0x4:
+      break;
+   case 0x5:
+      break;
+   case 0x6:
+      break;
+   case 0x7:
+      break;
+   case 0x8:
+      break;
+   case 0x9:
+      break;
+   case 0x0A:
+      break;
+   default:
+      break;
    }
-   get_tab_symb(file, i+1);
- }
+   get_tab_symb(file, i + 1);
+}
 
 void etape4(FILE *file)
 {
    int indice_tab_symb = get_tab_symb(file, 0);
-   if(indice_tab_symb == -1){
-     printf("Pas de table des symboles");
-     return;
+   if (indice_tab_symb == -1)
+   {
+      printf("Pas de table des symboles");
+      return;
    }
-   fseek(file, header.e_shoff + indice_tab_symb* sizeof(section), SEEK_SET);	//on va a la section de la table des symboles
-   fread(&section, 1, sizeof(section), file);
+   fseek(file, header.e_shoff + indice_tab_symb * sizeof(section), SEEK_SET); //on va a la section de la table des symboles
+   if (!fread(&section, 1, sizeof(section), file))
+   {
+
+      printf("Erreur fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
-   int count = section.sh_size / section.sh_entsize;	//nombre d'entree dans la table des symboles
-   printf("\nTable des symboles (section %d) à %d entrées: \n",indice_tab_symb, count);
+   int count = section.sh_size / section.sh_entsize; //nombre d'entree dans la table des symboles
+   printf("\nTable des symboles (section %d) à %d entrées: \n", indice_tab_symb, count);
    fseek(file, section.sh_offset, SEEK_SET);
    for (int i = 0; i < count; i++)
    {
-      fread(&symb, 1, sizeof(symb), file);
+      if (!fread(&symb, 1, sizeof(symb), file))
+      {
+
+         printf("Erreur fread");
+         exit(1);
+      }
       symbol_to_little_endian();
       printf("Num: %d |", i);
       printf("Valeur: %x |", symb.st_value);
       printf("Taille: %d |", symb.st_size);
       //printf("Type : %x  ", symb.st_info);
-      switch (symb.st_info){
-            case STT_NOTYPE:  printf("Type: NOTYPE |");break;
-            case STT_OBJECT:	printf("Type: OBJECT |");break;		/* Symbol is a data object */
-            case STT_FUNC:	printf("Type: FUNC |");break;	/* Symbol is a code object */
-            case STT_SECTION:	printf("Type: section |");break;	/* Symbol associated with a section */
-            case STT_FILE:	printf("Type: FILE |");break;		/* Symbol's name is file name */
-            case STT_COMMON:	printf("Type: COMMON |");break;	/* Symbol is a common data object */
-            case STT_TLS:	printf("Type: TLS |");break;		/* Symbol is thread-local data object*/
-            case STT_NUM:	printf("Type: NUM |");break;		/* Number of defined types.  */
-            case STT_LOOS:	printf("Type: LOOS |");break;	/* Start of OS-specific */
-            case STT_HIOS:	printf("Type: HIOS |");break;	/* End of OS-specific */
-            case STT_LOPROC:	printf("Type: LOPROC |");break;		/* Start of processor-specific */
-            case STT_HIPROC:	printf("Type: HIPROC |");break;		/* End of processor-specific */
-            default :  printf("Type: NOTYPE |");break;  ///problème ici!!!!
-
+      switch (symb.st_info)
+      {
+      case STT_NOTYPE:
+         printf("Type: NOTYPE |");
+         break;
+      case STT_OBJECT:
+         printf("Type: OBJECT |");
+         break; /* Symbol is a data object */
+      case STT_FUNC:
+         printf("Type: FUNC |");
+         break; /* Symbol is a code object */
+      case STT_SECTION:
+         printf("Type: section |");
+         break; /* Symbol associated with a section */
+      case STT_FILE:
+         printf("Type: FILE |");
+         break; /* Symbol's name is file name */
+      case STT_COMMON:
+         printf("Type: COMMON |");
+         break; /* Symbol is a common data object */
+      case STT_TLS:
+         printf("Type: TLS |");
+         break; /* Symbol is thread-local data object*/
+      case STT_NUM:
+         printf("Type: NUM |");
+         break; /* Number of defined types.  */
+      case STT_LOOS:
+         printf("Type: LOOS |");
+         break; /* Start of OS-specific */
+      case STT_HIOS:
+         printf("Type: HIOS |");
+         break; /* End of OS-specific */
+      case STT_LOPROC:
+         printf("Type: LOPROC |");
+         break; /* Start of processor-specific */
+      case STT_HIPROC:
+         printf("Type: HIPROC |");
+         break; /* End of processor-specific */
+      default:
+         printf("Type: NOTYPE |");
+         break; ///problème ici!!!!
       }
 
-     // printf(" Lien: %x \n", ELF32_ST_BIND(symb.st_info));
-      switch (ELF32_ST_BIND(symb.st_info)){
-            case STB_LOCAL: printf("Lien: LOCAL |");break;
-            case STB_GLOBAL: printf("Lien: GLOBAL |");break;
+      // printf(" Lien: %x \n", ELF32_ST_BIND(symb.st_info));
+      switch (ELF32_ST_BIND(symb.st_info))
+      {
+      case STB_LOCAL:
+         printf("Lien: LOCAL |");
+         break;
+      case STB_GLOBAL:
+         printf("Lien: GLOBAL |");
+         break;
       }
       //printf("symb.st_info = %i", symb.st_info);
       //printf("Vis : %x  ", symb.st_other);
 
-      switch(symb.st_other){
-            case STV_DEFAULT :	printf("Vis: DEFAULT |");break;		/* Default symbol visibility rules */
-            case STV_INTERNAL	:     printf("Vis: INTERNAL |");break;		/* Processor specific hidden class */
-            case STV_HIDDEN	: 	printf("Vis: HIDDEN |");break;	      /* Sym unavailable in other modules */
-            case STV_PROTECTED : 	printf("Vis: PROTECTED |");break;	      /* Not preemptible, not exported */
+      switch (symb.st_other)
+      {
+      case STV_DEFAULT:
+         printf("Vis: DEFAULT |");
+         break; /* Default symbol visibility rules */
+      case STV_INTERNAL:
+         printf("Vis: INTERNAL |");
+         break; /* Processor specific hidden class */
+      case STV_HIDDEN:
+         printf("Vis: HIDDEN |");
+         break; /* Sym unavailable in other modules */
+      case STV_PROTECTED:
+         printf("Vis: PROTECTED |");
+         break; /* Not preemptible, not exported */
       }
       //printf("Index: %x |", symb.st_shndx);
-      switch(symb.st_shndx){
-            case SHN_UNDEF:		printf("Ndx: UND |");break;	      /* Undefined section */
-            //case SHN_LORESERVE:	printf("Ndx : LORESERVE |");break;	/* Start of reserved indices */
-            //case SHN_LOPROC:      printf("Ndx : LOPROC |");break;	/* Start of processor-specific */
-            case SHN_BEFORE:		printf("Ndx: BEFORE |");break;	/* Order section before all others (Solaris).  */
-            case SHN_AFTER:		printf("Ndx: AFTER |");break;	/* Order section after all others (Solaris).  */
-            case SHN_HIPROC:		printf("Ndx: HIPROC |");break;	/* End of processor-specific */
-            case SHN_LOOS:		printf("Ndx: LOOS |");break;	      /* Start of OS-specific */
-            case SHN_HIOS:    	printf("Ndx: HIOS |");break;	      /* End of OS-specific */
-            case SHN_ABS:		printf("Ndx: ABS |");break;		/* Associated symbol is absolute */
-            case SHN_COMMON:		printf("Ndx: COMMON |");break;	/* Associated symbol is common */
-            //case SHN_XINDEX:	printf("Ndx : XINDEX |");break;	/* Index is in extra table.  */
-            case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;	/* End of reserved indices */
-            default : printf("Ndx: %d |", symb.st_shndx); break;
+      switch (symb.st_shndx)
+      {
+      case SHN_UNDEF:
+         printf("Ndx: UND |");
+         break; /* Undefined section */
+      //case SHN_LORESERVE:	printf("Ndx : LORESERVE |");break;	/* Start of reserved indices */
+      //case SHN_LOPROC:      printf("Ndx : LOPROC |");break;	/* Start of processor-specific */
+      case SHN_BEFORE:
+         printf("Ndx: BEFORE |");
+         break; /* Order section before all others (Solaris).  */
+      case SHN_AFTER:
+         printf("Ndx: AFTER |");
+         break; /* Order section after all others (Solaris).  */
+      case SHN_HIPROC:
+         printf("Ndx: HIPROC |");
+         break; /* End of processor-specific */
+      case SHN_LOOS:
+         printf("Ndx: LOOS |");
+         break; /* Start of OS-specific */
+      case SHN_HIOS:
+         printf("Ndx: HIOS |");
+         break; /* End of OS-specific */
+      case SHN_ABS:
+         printf("Ndx: ABS |");
+         break; /* Associated symbol is absolute */
+      case SHN_COMMON:
+         printf("Ndx: COMMON |");
+         break; /* Associated symbol is common */
+      //case SHN_XINDEX:	printf("Ndx : XINDEX |");break;	/* Index is in extra table.  */
+      case SHN_HIRESERVE:
+         printf("Ndx: HIRESERVE |");
+         break; /* End of reserved indices */
+      default:
+         printf("Ndx: %d |", symb.st_shndx);
+         break;
       }
       printf("Nom: %x \n", symb.st_name);
-
    }
 }
 
@@ -1244,118 +1355,155 @@ void etape5(FILE *file)
 {
    for (int i = 0; i < header.e_shnum; i++)
    {
-      fseek(file, header.e_shoff + i *sizeof(section), SEEK_SET);
-      fread(&section, 1, sizeof(section), file);
-      section_to_little_endian(&section);
-      if (section.sh_type == 4 || section.sh_type == 9){
-        int count = section.sh_size / section.sh_entsize;
-        printf("\nsection de redressage numéro : %d\n", i);
-        fseek(file, section.sh_offset, SEEK_SET);
-        for (int j = 0; j < count; j++)
-        {
-           if(section.sh_type == 4){
-             fread(&rela, 1, sizeof(rela), file);
-             rela_to_little_endian();
-             printf("Decalage: %llx |", rela.r_offset);
-             printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
-             printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
-           }
-           if(section.sh_type == 9){
-             fread(&rel, 1, sizeof(rel), file);
-             rel_to_little_endian();
-             printf("Decalage: %llx |", rel.r_offset);
-             printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
-           }
+      fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
+      if (!fread(&section, 1, sizeof(section), file))
+      {
 
-        }
+         printf("Erreur fread");
+         exit(1);
+      }
+      section_to_little_endian(&section);
+      if (section.sh_type == 4 || section.sh_type == 9)
+      {
+         int count = section.sh_size / section.sh_entsize;
+         printf("\nsection de redressage numéro : %d\n", i);
+         fseek(file, section.sh_offset, SEEK_SET);
+         for (int j = 0; j < count; j++)
+         {
+            if (section.sh_type == 4)
+            {
+               if (!fread(&rela, 1, sizeof(rela), file))
+               {
+
+                  printf("Erreur fread");
+                  exit(1);
+               }
+               rela_to_little_endian();
+               printf("Decalage: %x |", rela.r_offset);
+               printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
+               printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
+            }
+            if (section.sh_type == 9)
+            {
+               if (!fread(&rel, 1, sizeof(rel), file))
+               {
+
+                  printf("Erreur fread");
+                  exit(1);
+               }
+               rel_to_little_endian();
+               printf("Decalage: %x |", rel.r_offset);
+               printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
+            }
+         }
       }
    }
 }
 void crawler(FILE *f)
 {
 
-       unsigned char *buff = malloc(sizeof(unsigned char));
+   unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
-      for(int x = 0;x< header.e_shnum;x++){
-         Elf32_Shdr sec;
-   fseek(f, header.e_shoff + x* sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), f);
-   section_to_little_endian(&section);
-   fread(&sec, 1, sizeof(section), f);
-   section_to_little_endian(&sec);
-   if(ndx==1)
-   Sections1[x] = sec;
-   else if(ndx==2)
-   Sections2[x] = sec;
-  	//TODO: Show section name:
-   printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
-   int j, k;
-   int printed_smth = 0;
-   fseek(f, section.sh_offset, SEEK_SET);
-  	// Process every byte in the data of the section.
-   int i = 0;
-   int counter = i;
-   while (i < section.sh_size)
+   for (int x = 0; x < header.e_shnum; x++)
    {
-      printf("0x%08x ", i / 16);
-      counter = 0;
-      for (j = 0; j < section.sh_size; j++)
+      Elf32_Shdr sec;
+      fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
+      if (!fread(&section, 1, sizeof(section), f))
       {
-         for (k = 0; k < DWORD; k++)
+
+         printf("Erreur fread");
+         exit(1);
+      }
+      section_to_little_endian(&section);
+      if (!fread(&sec, 1, sizeof(section), f))
+      {
+
+         printf("Erreur fread");
+         exit(1);
+      }
+      section_to_little_endian(&sec);
+      if (ndx == 1)
+         Sections1[x] = sec;
+      else if (ndx == 2)
+         Sections2[x] = sec;
+      //TODO: Show section name:
+      printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
+      int j, k;
+      int printed_smth = 0;
+      fseek(f, section.sh_offset, SEEK_SET);
+      // Process every byte in the data of the section.
+      int i = 0;
+      int counter = i;
+      while (i < section.sh_size)
+      {
+         printf("0x%08x ", i / 16);
+         counter = 0;
+         for (j = 0; j < section.sh_size; j++)
          {
-               fread(buff, sizeof(*buff), 1, f);
+            for (k = 0; k < DWORD; k++)
+            {
+               if (!fread(buff, sizeof(*buff), 1, f))
+               {
+
+                  printf("Erreur fread");
+                  exit(1);
+               }
                ASCII_DUMP[i / 16 % HEXA] = *buff;
                i += 16;
                counter++;
-         }
-         printf(" ");
-         if ((counter) >12)
-         {
-           // fwrite(&ASCII_DUMP,sizeof(ASCII_DUMP),1,file2); 
-            counter = 0;
-            for (int n = 0; n < HEXA; n++)
-            {//printf("%c", ASCII_DUMP[n]);
-                   fputc(ASCII_DUMP[n],file2); 
-            if (i / 16 < section.sh_size)
-            {
-
-              // printf("\n");
-              // printf("0x%08x ", i / 16);
             }
-            else {}
+            printf(" ");
+            if ((counter) > 12)
+            {
+               // fwrite(&ASCII_DUMP,sizeof(ASCII_DUMP),1,file2);
+               counter = 0;
+               for (int n = 0; n < HEXA; n++)
+               { //printf("%c", ASCII_DUMP[n]);
+                  fputc(ASCII_DUMP[n], file2);
+                  if (i / 16 < section.sh_size)
+                  {
+
+                     // printf("\n");
+                     // printf("0x%08x ", i / 16);
+                  }
+                  else
+                  {
+                  }
+               }
+            }
+
+            printf("\nWriting the section : %s", sec_names + section.sh_name);
          }
       }
-      
-         printf("\nWriting the section : %s",sec_names + section.sh_name);
-           
-   }
-      }
-     
-   printf("\n");
-}
 
+      printf("\n");
+   }
 }
 int max(int a, int b)
 {
-    a = (a > b) ? a : b;
-    return a;
+   a = (a > b) ? a : b;
+   return a;
 }
-int crawl(char *bin, char *tmp){
-      
+int crawl(char *bin, char *tmp)
+{
+
    file1 = fopen(bin, "rb");
    file2 = fopen(tmp, "wb");
    etape1(file1);
    etape2(file1);
-   if(ndx==1)
-  { Sections1 = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
-  sec_1_count = header.e_shnum;}
+   if (ndx == 1)
+   {
+      Sections1 = malloc(sizeof(Elf32_Shdr) * header.e_shnum);
+      sec_1_count = header.e_shnum;
+   }
    else
-  { Sections2 = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
-  sec_2_count = header.e_shnum;}
+   {
+      Sections2 = malloc(sizeof(Elf32_Shdr) * header.e_shnum);
+      sec_2_count = header.e_shnum;
+   }
    crawler(file1);
    fclose(file1);
 
    fclose(file2);
    return 0;
 }
-
