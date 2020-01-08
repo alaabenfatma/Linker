@@ -1,12 +1,18 @@
 #include "brain.h"
 
 //local header
+FILE *file1;
 FILE *file2;
 Elf32_Ehdr header;
 Elf32_Shdr section;
 Elf32_Sym symb;
 Elf32_Rela rela;
 Elf32_Rel rel;
+Elf32_Shdr *Sections1;
+int sec_1_count;
+Elf32_Shdr *Sections2;
+int sec_2_count;
+int ndx = 1;
 char *sec_names = NULL;
 char *symb_names = NULL;
 typedef struct {
@@ -935,14 +941,6 @@ void get_sh_type()
          break;
    }
 }
-void surf_sections()
-{
-   printf("\n");
-   for (int i = 0; i < 4; i++)
-   {
-      printf("%c", (section.sh_name + i));
-   }
-}
 void get_section_names(FILE *file)
 {
   	//Lire les noms of sections
@@ -1275,14 +1273,20 @@ void etape5(FILE *file)
 }
 void crawler(FILE *f)
 {
+
        unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
       for(int x = 0;x< header.e_shnum;x++){
-
+         Elf32_Shdr sec;
    fseek(f, header.e_shoff + x* sizeof(section), SEEK_SET);
    fread(&section, 1, sizeof(section), f);
    section_to_little_endian(&section);
-  
+   fread(&sec, 1, sizeof(section), f);
+   section_to_little_endian(&sec);
+   if(ndx==1)
+   Sections1[x] = sec;
+   else if(ndx==2)
+   Sections2[x] = sec;
   	//TODO: Show section name:
    printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
    int j, k;
@@ -1299,71 +1303,53 @@ void crawler(FILE *f)
       {
          for (k = 0; k < DWORD; k++)
          {
-
-            if (i / 16 < section.sh_size)
-            {
-
                fread(buff, sizeof(*buff), 1, f);
-               printf("%02x", *buff);
                ASCII_DUMP[i / 16 % HEXA] = *buff;
-               
                i += 16;
                counter++;
-            }
-            else
-            {
-              	//printf(" ");
-            }
          }
          printf(" ");
-         if ((counter) > 12)
+         if ((counter) >12)
          {
-
+           // fwrite(&ASCII_DUMP,sizeof(ASCII_DUMP),1,file2); 
             counter = 0;
             for (int n = 0; n < HEXA; n++)
-            {
-               if (ASCII_DUMP[n] >= ' ' && ASCII_DUMP[n] <= '~')
-                  {printf("%c", ASCII_DUMP[n]);
-                   fputc(ASCII_DUMP[n],file2);}
-               else
-                 { printf(".");
-                  fputc(ASCII_DUMP[n],file2);}
-            }
+            {//printf("%c", ASCII_DUMP[n]);
+                   fputc(ASCII_DUMP[n],file2); 
             if (i / 16 < section.sh_size)
             {
 
-               printf("\n");
-               printf("0x%08x ", i / 16);
+              // printf("\n");
+              // printf("0x%08x ", i / 16);
             }
             else {}
          }
       }
-      if (counter > 0)
-         for (int n = 0; n < strlen(ASCII_DUMP) + 1; n++)
-         {
-            if (ASCII_DUMP[n] >= ' ' && ASCII_DUMP[n] <= '~')
-             {  printf("%c", ASCII_DUMP[n]);
-               fputc(ASCII_DUMP[n],file2);}
-            else
-              { printf(".");
-                  fputc(ASCII_DUMP[n],file2);}
-         }
+      
          printf("\nWriting the section : %s",sec_names + section.sh_name);
            
    }
-    
       }
      
    printf("\n");
 }
+
+}
 int crawl(char *bin, char *tmp){
       
-   FILE *file1 = fopen(bin, "rb");
+   file1 = fopen(bin, "rb");
    file2 = fopen(tmp, "wb");
    etape1(file1);
    etape2(file1);
+   if(ndx==1)
+  { Sections1 = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
+  sec_1_count = header.e_shnum;}
+   else
+  { Sections2 = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
+  sec_2_count = header.e_shnum;}
    crawler(file1);
    fclose(file1);
+
    fclose(file2);
    return 0;
 }
