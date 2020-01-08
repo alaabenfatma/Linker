@@ -1443,24 +1443,7 @@ void crawler(FILE *f)
       fseek(f, section.sh_offset, SEEK_SET);
       int i = 0;
       int counter = i;
-      while (i < section.sh_size)
-      {
-         counter = 0;
-         for (j = 0; j < section.sh_size; j++)
-         {
-            for (k = 0; k < DWORD; k++)
-            {
-               if (!fread(buff, sizeof(*buff), 1, f))
-               {
-                  printf("ERREUR fread");
-                  exit(1);
-               }
-               ASCII_DUMP[i / 16 % HEXA] = *buff;
-               i += 16;
-               counter++;
-            }
-         }
-      }
+      
    }
 }
 int max(int a, int b)
