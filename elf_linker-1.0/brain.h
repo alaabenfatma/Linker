@@ -20,6 +20,7 @@
 #define bswap_64(x) ((unsigned int)__builtin_bswap64(x))
 
 //Etape 1 interfaces
+char* get_func_name(FILE* elfFile, Elf32_Ehdr header, int i_table_chaine, int i_nom);
 void dump_sections(FILE *file, int i);
 void etape1(FILE *f);
 void etape2(FILE *f);
