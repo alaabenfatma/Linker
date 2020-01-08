@@ -2,22 +2,22 @@
 Elf32_Shdr current_sec;
 Elf32_Ehdr current_header;
 FILE *final;
-
+char progbits[1000];
 int n = 0;
+void append_progbits(char hex[]){
+  strcat(progbits,hex);
+}
 void printbin(unsigned char *buff,int len)
 {
   for (size_t j = 0; j <= len; j++)
   {
     fputc(buff[j], final);
   }
-}
+} 
 void printb(unsigned char *buff,int len)
 {
   for (size_t j = 0; j <=len; j++)
   {
-    if(&buff[j]==NULL){
-      break;
-    }
     if (buff[j] >= ' ' && buff[j] <= '~')
       printf("%c", buff[j]);
     else
@@ -37,11 +37,10 @@ void surf_sections1()
 
     unsigned char *buff = malloc(sizeof(unsigned char) * Sections1[i].section.sh_size);
     fseek(file1, Sections1[i].section.sh_offset, SEEK_SET);
-    fread(buff, Sections1[i].section.sh_size, 1, file1);
-    //strcat(Sections1[i].buff,'\0');
-    printb(buff,Sections1[i].section.sh_size);
+    fread(Sections1[i].buff, Sections1[i].section.sh_size, 1, file1);
+    printb(Sections1[i].buff,Sections1[i].section.sh_size);
   }
-}
+} 
 void surf_sections2()
 {
   int i = 0;
@@ -78,33 +77,32 @@ void fuse_sections()
         {
           printf("Writing section : %s\n", sec_names + Sections1[i].section.sh_name);
           Pure_Sections[n].section = Sections1[i].section;
-          strcat(Pure_Sections[n].buff, Sections1[i].buff);
-          strcat(Pure_Sections[n].buff, Sections2[j].buff);
-          printb(Pure_Sections[n].buff,Sections1[i].section.sh_size+Sections2[j].section.sh_size);
-          printbin(Pure_Sections[n].buff,Sections1[i].section.sh_size+Sections2[j].section.sh_size);
-          fwrite(&Pure_Sections[n].section, sizeof(Pure_Sections[n].section), 1, final);
+          printbin(Sections1[i].buff,Sections1[i].section.sh_size);
+          printbin(Sections2[j].buff,Sections2[j].section.sh_size);
+          //printb(Sections2[j].buff,Sections1[i].section.sh_size+Sections2[j].section.sh_size);
+          //printbin(Pure_Sections[n].buff,Sections1[i].section.sh_size+Sections2[j].section.sh_size);
+         // fwrite(&Pure_Sections[n].section, sizeof(Pure_Sections[n].section), 1, final);
 
           n++;
           limit++;
         }
-        else
-        { /*
-        if (limit > i)
-        {
-          continue;
-        }
-        printf("Writing section : %s", sec_names + Sections1[i].section.sh_name);
-        fseek(file1, Sections1[i].section.sh_offset, SEEK_SET);
-        Pure_Sections[n].section = Sections1[i];
-        fread(&Pure_Sections[n].buff, Sections1[i].section.sh_size + 16, 1, file1);
-        printb(Pure_Sections[n].buff);
-        printf("\n");
-        printbin(Pure_Sections[n].buff);
-        fwrite(&Pure_Sections[n].section, sizeof(Pure_Sections[n].section), 1, final);
-
+      else if(Sections2[j].section.sh_size==0)
+        { 
+        printf("Writing section 2: %s\n", sec_names + Sections1[i].section.sh_name);
+        Pure_Sections[n].section = Sections1[i].section;
+        printbin(Sections1[i].buff,Sections1[i].section.sh_size);
         n++;
-        limit++;*/
+        limit++;
         }
+        else if(Sections1[i].section.sh_size==0)
+        { 
+        printf("Writing section 3: %s\n", sec_names2 + Sections2[j].section.sh_name);
+        Pure_Sections[n].section = Sections2[j].section;
+        printbin(Sections2[j].buff,Sections2[j].section.sh_size);
+        n++;
+        limit++;
+        }
+        
       }
     }
   }
