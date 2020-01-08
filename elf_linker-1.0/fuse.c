@@ -122,70 +122,77 @@ void fuse_symbols()
   fseek(file2, section2.sh_offset, SEEK_SET);
   for (int i = 0; i < count1; i++)
   {
-     fread(&symb1, 1, sizeof(symb1), file1);
-     symbol_to_little_endian();
-     switch (ELF32_ST_BIND(symb1.st_info)){
-           case STB_LOCAL:
-           //ecrire dans la table des symboles resultat si le symbole ne s'y trouve pas deja
-           break;
-           case STB_GLOBAL:
-           //On regarde si deux symboles on le meme nom (symb1._st_name == symb2._st_name) entre les deux fichiers d'entrée, si oui alors l'edition de lien echoue
-           //Si un meme symbole est defini dans un fichier et indefini (UND) dans l'autre, on ecrit que la definition dans le fichier resultat
-           //Si le meme symbole est UND dans les deux fichiers, on ne le met qu'une fois dans le fichier resultat
-           //si un symbole n'apparait que dans un des deux fichiers on l'ecrit dans la table du fichier resultat
-           break;
-     }
-     /*Pour regarder si le symbole est defini :
-     switch(symb1.st_shndx){
-           case SHN_UNDEF:		printf("Ndx: UND |");break;
-           case SHN_BEFORE:		printf("Ndx: BEFORE |");break;
-           case SHN_AFTER:		printf("Ndx: AFTER |");break;
-           case SHN_HIPROC:		printf("Ndx: HIPROC |");break;
-           case SHN_LOOS:		printf("Ndx: LOOS |");break;
-           case SHN_HIOS:    	printf("Ndx: HIOS |");break;
-           case SHN_ABS:		printf("Ndx: ABS |");break;
-           case SHN_COMMON:		printf("Ndx: COMMON |");break;
-           case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;
-           default : printf("Ndx: %d |", symb1.st_shndx); break;
-     }
-     */
-  }
-
-
-
-
-  for (int i = 0; i < count2; i++)
-  {
-     fread(&symb2, 1, sizeof(symb2), file2);
-     symbol_to_little_endian();
-     switch (ELF32_ST_BIND(symb1.st_info)){
-           case STB_LOCAL:
-           //ecrire dans la table des symboles resultat si le symbole ne s'y trouve pas deja
-           break;
-           case STB_GLOBAL:
-           //On regarde si deux symboles on le meme nom (symb1._st_name == symb2._st_name) entre les deux fichiers d'entrée, si oui alors l'edition de lien echoue
-           //Si un meme symbole est defini dans un fichier et indefini (UND) dans l'autre, on ecrit que la definition dans le fichier resultat
-           //Si le meme symbole est UND dans les deux fichiers, on ne le met qu'une fois dans le fichier resultat
-           //si un symbole n'apparait que dans un des deux fichiers on l'ecrit dans la table du fichier resultat
-           break;
-     }
-     /*Pour regarder si le symbole est defini :
-     switch(symb1.st_shndx){
-           case SHN_UNDEF:		printf("Ndx: UND |");break;
-           case SHN_BEFORE:		printf("Ndx: BEFORE |");break;
-           case SHN_AFTER:		printf("Ndx: AFTER |");break;
-           case SHN_HIPROC:		printf("Ndx: HIPROC |");break;
-           case SHN_LOOS:		printf("Ndx: LOOS |");break;
-           case SHN_HIOS:    	printf("Ndx: HIOS |");break;
-           case SHN_ABS:		printf("Ndx: ABS |");break;
-           case SHN_COMMON:		printf("Ndx: COMMON |");break;
-           case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;
-           default : printf("Ndx: %d |", symb1.st_shndx); break;
-     }
-     */
+     for (int i = 0; i < count2; i++)
+     {
+        fread(&symb1, 1, sizeof(symb1), file1);
+        symbol_to_little_endian();
+        fread(&symb2, 1, sizeof(symb2), file2);
+        symbol_to_little_endian();
+        switch (ELF32_ST_BIND(symb1.st_info)){
+              case STB_LOCAL:
+              //ecrire dans la table des symboles resultat si le symbole ne s'y trouve pas deja
+                switch (ELF32_ST_BIND(symb2.st_info)){
+                  case STB_LOCAL:
+                  if (symb1.st_name == symb2.st_name){
+                    //alors on ecrit que le symb1 dans la table resultat s'il n'y est pas deja
+                  }
+                  else {
+                    // on ecrit le symb1 et le symb2 dans la table resultat s'il n'y sont pas deja
+                  }
+                  break;
+                  case STB_GLOBAL:
+                  //on ecrit le symb1 dans la table resultat s'il n'y est pas deja
+                  break;
+                }
+              break;
+              case STB_GLOBAL:
+              //On regarde si deux symboles on le meme nom (symb1._st_name == symb2._st_name) entre les deux fichiers d'entrée, si oui alors l'edition de lien echoue
+              //Si un meme symbole est defini dans un fichier et indefini (UND) dans l'autre, on ecrit que la definition dans le fichier resultat
+              //Si le meme symbole est UND dans les deux fichiers, on ne le met qu'une fois dans le fichier resultat
+              //si un symbole n'apparait que dans un des deux fichiers on l'ecrit dans la table du fichier resultat
+              switch (ELF32_ST_BIND(symb2.st_info)){
+                case STB_LOCAL:
+                //on ecrit le symb1 dans la table resultat s'il n'y est pas deja
+                break;
+                case STB_GLOBAL:
+                if (symb1.st_name == symb2.st_name){
+                  if(symb1.st_shndx == symb2.st_shndx && symb2.st_shndx !=  SHN_UNDEF){
+                    //l'edition de lien echoue completement
+                  }
+                  if(symb1.st_shndx == SHN_UNDEF && symb2.st_shndx != SHN_UNDEF){
+                    //on ecrit le symb2 qui porte la definition
+                  }
+                  if(symb2.st_shndx == SHN_UNDEF && symb1.st_shndx != SHN_UNDEF){
+                    //on ecrit le symb1 qui porte la definition
+                  }
+                  if(symb2.st_shndx == SHN_UNDEF && symb1.st_shndx == SHN_UNDEF){
+                    //on ecrit l'un des deux symboles au choix
+                  }
+                }
+                else {
+                  //on ecrit le symb1
+                }
+                break;
+              }
+              break;
+        }
+        /*Pour regarder si le symbole est defini :
+        switch(symb1.st_shndx){
+              case SHN_UNDEF:		printf("Ndx: UND |");break;
+              case SHN_BEFORE:		printf("Ndx: BEFORE |");break;
+              case SHN_AFTER:		printf("Ndx: AFTER |");break;
+              case SHN_HIPROC:		printf("Ndx: HIPROC |");break;
+              case SHN_LOOS:		printf("Ndx: LOOS |");break;
+              case SHN_HIOS:    	printf("Ndx: HIOS |");break;
+              case SHN_ABS:		printf("Ndx: ABS |");break;
+              case SHN_COMMON:		printf("Ndx: COMMON |");break;
+              case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;
+              default : printf("Ndx: %d |", symb1.st_shndx); break;
+        }
+        */
+      }
    }
- }
-
+}
 
 
 int main(int argc, char *argv[])
