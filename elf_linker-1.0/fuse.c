@@ -11,7 +11,7 @@ void append_progbits(char hex[])
 }
 void printbin(unsigned char *buff, int len)
 {
-  for (size_t j = 0; j <= len; j++)
+  for (size_t j = 0; j < len; j++)
   {
     fputc(buff[j], final);
   }
