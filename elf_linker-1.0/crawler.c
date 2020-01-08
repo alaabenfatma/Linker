@@ -8,12 +8,20 @@ Elf32_Shdr section;
 Elf32_Sym symb;
 Elf32_Rela rela;
 Elf32_Rel rel;
-Elf32_Shdr *Sections1;
+
+typedef struct
+{
+  unsigned char buff[1000];
+  Elf32_Shdr section;
+} Pure_Section;
+Pure_Section *Pure_Sections;
+Pure_Section *Sections1;
 int sec_1_count;
-Elf32_Shdr *Sections2;
+Pure_Section *Sections2;
 int sec_2_count;
 int ndx = 1;
 char *sec_names = NULL;
+char *sec_names2 = NULL;
 char *symb_names = NULL;
 typedef struct
 {
@@ -1398,8 +1406,7 @@ void etape5(FILE *file)
          }
       }
    }
-}
-void crawler(FILE *f)
+}void crawler(FILE *f)
 {
 
    unsigned char *buff = malloc(sizeof(unsigned char));
@@ -1408,75 +1415,36 @@ void crawler(FILE *f)
    {
       Elf32_Shdr sec;
       fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
-      if (!fread(&section, 1, sizeof(section), f))
-      {
-
-         printf("Erreur fread");
-         exit(1);
-      }
+      fread(&section, 1, sizeof(section), f);
       section_to_little_endian(&section);
-      if (!fread(&sec, 1, sizeof(section), f))
-      {
-
-         printf("Erreur fread");
-         exit(1);
-      }
+      fread(&sec, 1, sizeof(section), f);
       section_to_little_endian(&sec);
       if (ndx == 1)
-         Sections1[x] = sec;
+         Sections1[x].section = sec;
       else if (ndx == 2)
-         Sections2[x] = sec;
+         Sections2[x].section = sec;
       //TODO: Show section name:
-      printf("\nVidange hexadécimale de la section « %s » :\n", sec_names + section.sh_name);
       int j, k;
       int printed_smth = 0;
       fseek(f, section.sh_offset, SEEK_SET);
-      // Process every byte in the data of the section.
       int i = 0;
       int counter = i;
       while (i < section.sh_size)
       {
-         printf("0x%08x ", i / 16);
          counter = 0;
          for (j = 0; j < section.sh_size; j++)
          {
             for (k = 0; k < DWORD; k++)
             {
-               if (!fread(buff, sizeof(*buff), 1, f))
-               {
-
-                  printf("Erreur fread");
-                  exit(1);
-               }
+               fread(buff, sizeof(*buff), 1, f);
                ASCII_DUMP[i / 16 % HEXA] = *buff;
                i += 16;
                counter++;
             }
-            printf(" ");
-            if ((counter) > 12)
-            {
-               // fwrite(&ASCII_DUMP,sizeof(ASCII_DUMP),1,file2);
-               counter = 0;
-               for (int n = 0; n < HEXA; n++)
-               { //printf("%c", ASCII_DUMP[n]);
-                  fputc(ASCII_DUMP[n], file2);
-                  if (i / 16 < section.sh_size)
-                  {
-
-                     // printf("\n");
-                     // printf("0x%08x ", i / 16);
-                  }
-                  else
-                  {
-                  }
-               }
-            }
-
-            printf("\nWriting the section : %s", sec_names + section.sh_name);
+            
+            
          }
       }
-
-      printf("\n");
    }
 }
 int max(int a, int b)
