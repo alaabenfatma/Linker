@@ -4,19 +4,21 @@ Elf32_Ehdr current_header;
 FILE *final;
 char progbits[1000];
 int n = 0;
-void append_progbits(char hex[]){
-  strcat(progbits,hex);
+int symb_n = 0;
+void append_progbits(char hex[])
+{
+  strcat(progbits, hex);
 }
-void printbin(unsigned char *buff,int len)
+void printbin(unsigned char *buff, int len)
 {
   for (size_t j = 0; j <= len; j++)
   {
     fputc(buff[j], final);
   }
-} 
-void printb(unsigned char *buff,int len)
+}
+void printb(unsigned char *buff, int len)
 {
-  for (size_t j = 0; j <=len; j++)
+  for (size_t j = 0; j <= len; j++)
   {
     if (buff[j] >= ' ' && buff[j] <= '~')
       printf("%c", buff[j]);
@@ -36,9 +38,9 @@ void surf_sections1()
     unsigned char *buff = malloc(sizeof(unsigned char) * Sections1[i].section.sh_size);
     fseek(file1, Sections1[i].section.sh_offset, SEEK_SET);
     fread(Sections1[i].buff, Sections1[i].section.sh_size, 1, file1);
-    printb(Sections1[i].buff,Sections1[i].section.sh_size);
+    printb(Sections1[i].buff, Sections1[i].section.sh_size);
   }
-} 
+}
 void surf_sections2()
 {
   int i = 0;
@@ -66,59 +68,68 @@ void fuse_sections()
     for (size_t j = 0; j < sec_2_count; j++)
     {
 
-       if (Sections1[i].section.sh_type == SHT_PROGBITS && Sections2[j].section.sh_type  == SHT_PROGBITS)
+      if (Sections1[i].section.sh_type == SHT_PROGBITS && Sections2[j].section.sh_type == SHT_PROGBITS)
       {
-        printf("comarping names %s ? %s\n",sec_names + Sections1[i].section.sh_name,sec_names2 + Sections2[j].section.sh_name);
-        if (0==strcmp((char *)(sec_names + Sections1[i].section.sh_name), (char *)(sec_names2 + Sections2[j].section.sh_name)))
+        printf("comarping names %s ? %s\n", sec_names + Sections1[i].section.sh_name, sec_names2 + Sections2[j].section.sh_name);
+        if (0 == strcmp((char *)(sec_names + Sections1[i].section.sh_name), (char *)(sec_names2 + Sections2[j].section.sh_name)))
         {
           printf("Writing section : %s\n", sec_names + Sections1[i].section.sh_name);
           Pure_Sections[n].section = Sections1[i].section;
-          printbin(Sections1[i].buff,Sections1[i].section.sh_size);
-          printbin(Sections2[j].buff,Sections2[j].section.sh_size);
+          printbin(Sections1[i].buff, Sections1[i].section.sh_size);
+          printbin(Sections2[j].buff, Sections2[j].section.sh_size);
           //printb(Sections2[j].buff,Sections1[i].section.sh_size+Sections2[j].section.sh_size);
           //printbin(Pure_Sections[n].buff,Sections1[i].section.sh_size+Sections2[j].section.sh_size);
-         // fwrite(&Pure_Sections[n].section, sizeof(Pure_Sections[n].section), 1, final);
+          // fwrite(&Pure_Sections[n].section, sizeof(Pure_Sections[n].section), 1, final);
 
           n++;
           limit++;
         }
-      else if(Sections2[j].section.sh_size==0)
-        { 
+        else if (Sections2[j].section.sh_size == 0)
+        {
+          printf("Writing section 2: %s\n", sec_names + Sections1[i].section.sh_name);
+          Pure_Sections[n].section = Sections1[i].section;
+          printbin(Sections1[i].buff, Sections1[i].section.sh_size);
+          n++;
+          limit++;
+        }
+        else if (Sections1[i].section.sh_size == 0)
+        {
+          printf("Writing section 3: %s\n", sec_names2 + Sections2[j].section.sh_name);
+          Pure_Sections[n].section = Sections2[j].section;
+          printbin(Sections2[j].buff, Sections2[j].section.sh_size);
+          n++;
+          limit++;
+        }
+      }
+      else
+      {
+        if (limit >= i)
+          continue;
+        if (Sections1[i].section.sh_type == SHT_PROGBITS)
+          continue;
+        limit++;
         printf("Writing section 2: %s\n", sec_names + Sections1[i].section.sh_name);
         Pure_Sections[n].section = Sections1[i].section;
-        printbin(Sections1[i].buff,Sections1[i].section.sh_size);
+        printbin(Sections1[i].buff, Sections1[i].section.sh_size);
         n++;
-        limit++;
-        }
-        else if(Sections1[i].section.sh_size==0)
-        { 
-        printf("Writing section 3: %s\n", sec_names2 + Sections2[j].section.sh_name);
-        Pure_Sections[n].section = Sections2[j].section;
-        printbin(Sections2[j].buff,Sections2[j].section.sh_size);
-        n++;
-        limit++;
-        }
-
       }
-      else{
-        if(limit>i) continue;
-        limit++; printf("Writing section 2: %s\n", sec_names + Sections1[i].section.sh_name);
-        Pure_Sections[n].section = Sections1[i].section;
-        printbin(Sections1[i].buff,Sections1[i].section.sh_size);
-        n++;}
     }
   }
 }
-void append_sections_to_file(){
+void append_sections_to_file()
+{
   for (size_t i = 0; i < n; i++)
   {
-    fwrite(&Pure_Sections[i].section,sizeof(Pure_Sections[i].section),1,final);
+    fwrite(&Pure_Sections[i].section, sizeof(Pure_Sections[i].section), 1, final);
   }
-  
-  
 }
-Elf32_Sym symb1, symb2;
+Elf32_Sym *symbols;
 Elf32_Shdr section1, section2;
+void append_symbol(Elf32_Sym s)
+{
+  symbols[symb_n] = s;
+  symb_n++;
+}
 void fuse_symbols()
 {
   int indice_tab_symb1 = get_tab_symb(file1, 0);
@@ -127,7 +138,7 @@ void fuse_symbols()
     printf("Pas de table des symboles dans le fichier1");
     return;
   }
-  int indice_tab_symb2 = get_tab_symb(file1, 0);
+  int indice_tab_symb2 = get_tab_symb(file2, 0);
   if (indice_tab_symb2 == -1)
   {
     printf("Pas de table des symboles dans le fichier2");
@@ -143,13 +154,15 @@ void fuse_symbols()
   fread(&section2, 1, sizeof(section2), file2);
   section_to_little_endian(&section2);
   int count2 = section2.sh_size / section2.sh_entsize; //nombre d'entree dans la table des symboles
-
+  symbols = malloc(sizeof(Elf32_Sym) * max(count1, count2));
   fseek(file1, section1.sh_offset, SEEK_SET);
   fseek(file2, section2.sh_offset, SEEK_SET);
+
   for (int i = 0; i < count1; i++)
   {
     for (int i = 0; i < count2; i++)
     {
+      Elf32_Sym symb1, symb2;
       fread(&symb1, 1, sizeof(symb1), file1);
       symbol_to_little_endian();
       fread(&symb2, 1, sizeof(symb2), file2);
@@ -164,14 +177,18 @@ void fuse_symbols()
           if (symb1.st_name == symb2.st_name)
           {
             //alors on ecrit que le symb1 dans la table resultat s'il n'y est pas deja
+            append_symbol(symb1);
           }
           else
           {
             // on ecrit le symb1 et le symb2 dans la table resultat s'il n'y sont pas deja
+            append_symbol(symb1);
+            append_symbol(symb2);
           }
           break;
         case STB_GLOBAL:
           //on ecrit le symb1 dans la table resultat s'il n'y est pas deja
+          append_symbol(symb1);
           break;
         }
         break;
@@ -184,6 +201,7 @@ void fuse_symbols()
         {
         case STB_LOCAL:
           //on ecrit le symb1 dans la table resultat s'il n'y est pas deja
+          append_symbol(symb1);
           break;
         case STB_GLOBAL:
           if (symb1.st_name == symb2.st_name)
@@ -191,23 +209,29 @@ void fuse_symbols()
             if (symb1.st_shndx == symb2.st_shndx && symb2.st_shndx != SHN_UNDEF)
             {
               //l'edition de lien echoue completement
+              printf("ERROR SAME NAME.");
+              exit(1);
             }
             if (symb1.st_shndx == SHN_UNDEF && symb2.st_shndx != SHN_UNDEF)
             {
               //on ecrit le symb2 qui porte la definition
+              append_symbol(symb2);
             }
             if (symb2.st_shndx == SHN_UNDEF && symb1.st_shndx != SHN_UNDEF)
             {
               //on ecrit le symb1 qui porte la definition
+              append_symbol(symb1);
             }
             if (symb2.st_shndx == SHN_UNDEF && symb1.st_shndx == SHN_UNDEF)
             {
               //on ecrit l'un des deux symboles au choix
+              append_symbol(symb1);
             }
           }
           else
           {
             //on ecrit le symb1
+            append_symbol(symb1);
           }
           break;
         }
@@ -229,6 +253,7 @@ void fuse_symbols()
         */
     }
   }
+  fwrite(&symbols, sizeof(symbols), 1, final);
 }
 
 int main(int argc, char *argv[])
@@ -251,7 +276,9 @@ int main(int argc, char *argv[])
 
   printf("\n--\n");
   fuse_sections();
+  fuse_symbols();
   append_sections_to_file();
+
   fclose(file1);
   fclose(file2);
   fclose(final);
