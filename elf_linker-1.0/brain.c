@@ -77,7 +77,8 @@ void load_data(FILE *file)
          printf("Error header");
          exit(1);
       }
-      
+      //ENDIANESS!!
+      if(header.e_ident[5] == 0x2) ENDIAN=1;
       header_to_little_endian();
 
       fseek(file, (header.e_shoff) + (header.e_shstrndx) * sizeof(section), SEEK_SET);
@@ -87,6 +88,7 @@ void load_data(FILE *file)
          exit(1);
       }
       section_to_little_endian();
+      get_section_names(file);
       if (header.e_ident[0] == 0x7f && header.e_ident[1] == 'E' && header.e_ident[2] == 'L' && header.e_ident[3] == 'F')
       {
          //ignore
@@ -139,7 +141,7 @@ void get_donnees()
    else if (header.e_ident[5] == 0x2)
    {
       printf("Données: Complément à 2, système à octets de poids fort d'abord (big endian)\n");
-      ENDIAN = 1;
+      
    }
 }
 void get_e_version()
@@ -1057,6 +1059,7 @@ void etape2(FILE *f)
 }
 void etape3(FILE *f, int x)
 {
+   
    if(isLoaded==0){
       load_data(f);
    }
@@ -1251,29 +1254,27 @@ void etape5(FILE *file)
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i *sizeof(section), SEEK_SET);
-      fread(&section, 1, sizeof(section), file);
+      fread(&section, sizeof(section),1, file);
       section_to_little_endian();
-      if (section.sh_type == 4 || section.sh_type == 9){
-        int count = section.sh_size / section.sh_entsize;
+      if (section.sh_type & 0x4 || section.sh_type & 0x9){
+        //int count = section.sh_size % section.sh_entsize;
         printf("\nSection de redressage numéro : %d\n", i);
         fseek(file, section.sh_offset, SEEK_SET);
-        for (int j = 0; j < count; j++)
-        {
-           if(section.sh_type == 4){
+           if(section.sh_type & 0x4){
              fread(&rela, 1, sizeof(rela), file);
              rela_to_little_endian();
              printf("Decalage: %x |", rela.r_offset);
              printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
-             printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
+             printf("Index: %d\n", ELF32_R_SYM(rela.r_info));
            }
-           if(section.sh_type == 9){
+           if(section.sh_type & 0x9){
              fread(&rel, 1, sizeof(rel), file);
              rel_to_little_endian();
              printf("Decalage: %x |", rel.r_offset);
              printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
            }
 
-        }
+        
       }
    }
 }
