@@ -117,6 +117,8 @@ etape2(){
 }
 #######################
 ######## Etape 3 ######
+
+
 etape3(){
     prog=$1
     Flag_etape3=0
@@ -136,7 +138,7 @@ nombre_de_section(){
         Flag_nb_section=1
         #nombre d'entrée de la tables des symboles différent"
     else
-        second=$(readelf -s $1 | egrep "Table de symboles" | cut -d" " -f8)
+        second=$(readelf -s $1 | egrep "La table de symboles" | cut -d" " -f7)
         if [ $first -ne $second ]
         then
            Flag_nb_section=1 
@@ -235,7 +237,10 @@ do
                     read no_etape;
                     ;;
                     3)
-                    etape3
+                    etape3 $programme
+                    echo "*******************************************"
+                    affiche_etape
+                    read no_etape;
                     ;;
                     4)
                     etape4 $programme
