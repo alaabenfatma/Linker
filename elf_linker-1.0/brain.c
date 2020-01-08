@@ -1170,11 +1170,33 @@ int get_tab_symb(FILE *file, int i)
    get_tab_symb(file, i+1);
  }
 
+char* get_func_name(FILE* f, Elf32_Ehdr header, int sh_link, int st_name){
+      Elf32_Shdr sec;
+      int pos = ftell(f);
+      char* name = malloc(10*sizeof(char));
+      fseek(f, header.e_shoff+sh_link*header.e_shentsize,SEEK_SET);
+      fread(&sec, 1, sizeof(sec), f);
+      section_to_little_endian();
+      fseek(f,sec.sh_offset+st_name,SEEK_SET);
+      char c = fgetc(f);
+      int i=0;
+      while(c!='\0' && i<10){
+            name[i]=c;
+            i++;
+            c=fgetc(f);
+      }
+      name[i]='\0';
+      fseek(f,pos,SEEK_SET);
+      return name;
+}
+
 void etape4(FILE *file)
 {
    if(isLoaded==0){
       load_data(file);
    }
+   
+   
    int indice_tab_symb = get_tab_symb(file, 0);
    if(indice_tab_symb == -1){
      printf("Pas de table des symboles");
@@ -1189,7 +1211,10 @@ void etape4(FILE *file)
    for (int i = 0; i < count; i++)
    {
       fread(&symb, 1, sizeof(symb), file);
+      
+      
       symbol_to_little_endian();
+      
       printf("Num: %d |", i);
       printf("Valeur: %x |", symb.st_value);
       printf("Taille: %d |", symb.st_size);
@@ -1241,10 +1266,16 @@ void etape4(FILE *file)
             case SHN_HIRESERVE:	printf("Ndx: HIRESERVE |");break;	/* End of reserved indices */
             default : printf("Ndx: %d |", symb.st_shndx); break;
       }
-      printf("Nom: %x \n", symb.st_name);
+      double st = symb.st_name;
+      double sh = section.sh_link;
+      
+            printf("Nom: %s \n",get_func_name(file, header, sh, st));
+            
+      
 
    }
 }
+
 
 void etape5(FILE *file)
 {
