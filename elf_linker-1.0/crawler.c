@@ -11,8 +11,8 @@ Elf32_Rel rel;
 
 typedef struct
 {
-  unsigned char buff[1000];
-  Elf32_Shdr section;
+   unsigned char buff[1000];
+   Elf32_Shdr section;
 } Pure_Section;
 Pure_Section *Pure_Sections;
 Pure_Section *Sections1;
@@ -807,17 +807,17 @@ void get_e_version2()
 
 void get_e_entry()
 {
-   printf("Adresse du point d'entrée: 0x%lx \n", header.e_entry);
+   printf("Adresse du point d'entrée: 0x%x \n", header.e_entry);
 }
 
 void get_e_phoff()
 {
-   printf("Début des en-têtes de programme : %lx (octets dans le fichier)\n", header.e_phoff);
+   printf("Début des en-têtes de programme : %x (octets dans le fichier)\n", header.e_phoff);
 }
 
 void get_e_shoff()
 {
-   printf("Début des en-têtes de section : %li (octets dans le fichier)\n", header.e_shoff);
+   printf("Début des en-têtes de section : %i (octets dans le fichier)\n", header.e_shoff);
 }
 
 void get_e_flags()
@@ -968,16 +968,26 @@ void get_sh_type()
 void get_section_names(FILE *file)
 {
    //Lire les noms of sections
-   if(ndx==1){
-   sec_names = malloc(section.sh_size);
-   fseek(file, section.sh_offset, SEEK_SET);
-   fread(sec_names, 1, section.sh_size, file);
-}
-else{
-    sec_names2 = malloc(section.sh_size);
-   fseek(file, section.sh_offset, SEEK_SET);
-   fread(sec_names2, 1, section.sh_size, file);
-}
+   if (ndx == 1)
+   {
+      sec_names = malloc(section.sh_size);
+      fseek(file, section.sh_offset, SEEK_SET);
+      if (!fread(sec_names, 1, section.sh_size, file))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
+   }
+   else
+   {
+      sec_names2 = malloc(section.sh_size);
+      fseek(file, section.sh_offset, SEEK_SET);
+      if (!fread(sec_names2, 1, section.sh_size, file))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
+   }
 }
 void etape1(FILE *f)
 {
@@ -1005,11 +1015,15 @@ void dump_sections(FILE *file, int i)
    if (i == header.e_shnum)
       return;
    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), file);
+   if (!fread(&section, 1, sizeof(section), file))
+   {
+      printf("ERREUR fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
 
    printf("\n--- NEW section ---\n");
-   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%lx\n", i, sec_names + section.sh_name, section.sh_size);
+   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
    printf("Type:\t");
    switch (section.sh_type)
    {
@@ -1052,7 +1066,7 @@ void dump_sections(FILE *file, int i)
       break;
    }
    printf("\n");
-   printf("Properties (flag %lx) : ", section.sh_flags);
+   printf("Properties (flag %x) : ", section.sh_flags);
    //Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#section_header
    if (section.sh_flags & SHF_WRITE)
       printf("W");
@@ -1077,7 +1091,7 @@ void dump_sections(FILE *file, int i)
    if (section.sh_flags & SHF_EXCLUDE)
       printf("E");
    printf("\n");
-   printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
+   printf("Position of section (en octets) :\t%o\n", section.sh_offset);
    printf("The section will be written in a file");
 
    dump_sections(file, i + 1);
@@ -1091,7 +1105,11 @@ void etape3(FILE *f, int x)
 {
 
    fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), f);
+   if (!fread(&section, 1, sizeof(section), f))
+   {
+      printf("ERREUR fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
    unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
@@ -1115,7 +1133,11 @@ void etape3(FILE *f, int x)
             if (i / 16 < section.sh_size)
             {
 
-               fread(buff, sizeof(*buff), 1, f);
+               if (!fread(buff, sizeof(*buff), 1, f))
+               {
+                  printf("ERREUR fread");
+                  exit(1);
+               }
                printf("%02x", *buff);
                ASCII_DUMP[i / 16 % HEXA] = *buff;
                i += 16;
@@ -1165,9 +1187,13 @@ void etape3(FILE *f, int x)
 int get_tab_symb(FILE *file, int i)
 {
    if (i == header.e_shnum)
-      return;
+      return 0;
    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-   fread(&section, 1, sizeof(section), file);
+   if (!fread(&section, 1, sizeof(section), file))
+   {
+      printf("ERREUR fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
    switch (section.sh_type)
    {
@@ -1208,14 +1234,22 @@ void etape4(FILE *file)
       return;
    }
    fseek(file, header.e_shoff + indice_tab_symb * sizeof(section), SEEK_SET); //on va a la section de la table des symboles
-   fread(&section, 1, sizeof(section), file);
+   if (!fread(&section, 1, sizeof(section), file))
+   {
+      printf("ERREUR fread");
+      exit(1);
+   }
    section_to_little_endian(&section);
    int count = section.sh_size / section.sh_entsize; //nombre d'entree dans la table des symboles
    printf("\nTable des symboles (section %d) à %d entrées: \n", indice_tab_symb, count);
    fseek(file, section.sh_offset, SEEK_SET);
    for (int i = 0; i < count; i++)
    {
-      fread(&symb, 1, sizeof(symb), file);
+      if (!fread(&symb, 1, sizeof(symb), file))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
       symbol_to_little_endian();
       printf("Num: %d |", i);
       printf("Valeur: %x |", symb.st_value);
@@ -1338,7 +1372,11 @@ void etape5(FILE *file)
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-      fread(&section, 1, sizeof(section), file);
+      if (!fread(&section, 1, sizeof(section), file))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
       section_to_little_endian(&section);
       if (section.sh_type == 4 || section.sh_type == 9)
       {
@@ -1349,17 +1387,25 @@ void etape5(FILE *file)
          {
             if (section.sh_type == 4)
             {
-               fread(&rela, 1, sizeof(rela), file);
+               if (!fread(&rela, 1, sizeof(rela), file))
+               {
+                  printf("ERREUR fread");
+                  exit(1);
+               }
                rela_to_little_endian();
-               printf("Decalage: %llx |", rela.r_offset);
+               printf("Decalage: %x |", rela.r_offset);
                printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
                printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
             }
             if (section.sh_type == 9)
             {
-               fread(&rel, 1, sizeof(rel), file);
+               if (!fread(&rel, 1, sizeof(rel), file))
+               {
+                  printf("ERREUR fread");
+                  exit(1);
+               }
                rel_to_little_endian();
-               printf("Decalage: %llx |", rel.r_offset);
+               printf("Decalage: %x |", rel.r_offset);
                printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
             }
          }
@@ -1375,9 +1421,17 @@ void crawler(FILE *f)
    {
       Elf32_Shdr sec;
       fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
-      fread(&section, 1, sizeof(section), f);
+      if (!fread(&section, 1, sizeof(section), f))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
       section_to_little_endian(&section);
-      fread(&sec, 1, sizeof(section), f);
+      if (!fread(&sec, 1, sizeof(section), f))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
       section_to_little_endian(&sec);
       if (ndx == 1)
          Sections1[x].section = sec;
@@ -1396,13 +1450,15 @@ void crawler(FILE *f)
          {
             for (k = 0; k < DWORD; k++)
             {
-               fread(buff, sizeof(*buff), 1, f);
+               if (!fread(buff, sizeof(*buff), 1, f))
+               {
+                  printf("ERREUR fread");
+                  exit(1);
+               }
                ASCII_DUMP[i / 16 % HEXA] = *buff;
                i += 16;
                counter++;
             }
-            
-            
          }
       }
    }
@@ -1433,5 +1489,241 @@ int crawl(char *bin, char *tmp)
    fclose(file1);
 
    fclose(file2);
+   return 0;
+}
+
+//same as get_func_name
+char *get_func_name2(FILE *f, Elf32_Ehdr header, int sh_link, int st_name)
+{
+   Elf32_Shdr sec;
+   int pos = ftell(f);
+   char *name = malloc(10 * sizeof(char));
+   fseek(f, header.e_shoff + sh_link * header.e_shentsize, SEEK_SET);
+   if(!fread(&sec, 1, sizeof(sec), f)){
+      printf("ERREUR fread");
+      exit(1);
+   }
+   section_to_little_endian(&sec);
+   fseek(f, sec.sh_offset + st_name, SEEK_SET);
+   char c = fgetc(f);
+   int i = 0;
+   while (c != '\0' && i < 10)
+   {
+      name[i] = c;
+      i++;
+      c = fgetc(f);
+   }
+   name[i] = '\0';
+   fseek(f, pos, SEEK_SET);
+   return name;
+}
+
+//same as symbol_to_little_endian
+void symbol_to_little_endian2(Elf32_Sym *sy)
+{
+   if (ENDIAN == 1)
+   {
+      sy->st_name = reverse_2(sy->st_name);
+      sy->st_value = reverse_2(sy->st_value);
+      sy->st_size = reverse_2(sy->st_size);
+      /*
+   These are already in unsigned char, can't be swapped.
+   sy->st_info = reverse_4(sy->st_info);
+   sy->st_other = reverse_4(sy->st_other);*/
+      sy->st_shndx = reverse_2(sy->st_shndx);
+   }
+}
+
+//same as section_to_little_endian
+void section_to_little_endian2(Elf32_Shdr *sec)
+{
+   if (ENDIAN == 1)
+   {
+      sec->sh_name = reverse_4(sec->sh_name);
+      sec->sh_type = reverse_4(sec->sh_type);
+      sec->sh_flags = reverse_4(sec->sh_flags);
+      sec->sh_addr = reverse_4(sec->sh_addr);
+      sec->sh_offset = reverse_4(sec->sh_offset);
+      sec->sh_size = reverse_4(sec->sh_size);
+      sec->sh_link = reverse_4(sec->sh_link);
+      sec->sh_info = reverse_4(sec->sh_info);
+      sec->sh_addralign = reverse_4(sec->sh_addralign);
+      sec->sh_entsize = reverse_4(sec->sh_entsize);
+   }
+}
+
+//almost the same as load_data
+void load_data2(FILE *file, Elf32_Ehdr *h, Elf32_Shdr *s)
+{
+   //isLoaded = 1;
+   if (file)
+   {
+      if (!fread(h, 1, sizeof(Elf32_Ehdr), file))
+      {
+         printf("Error header");
+         exit(1);
+      }
+      //ENDIANESS!!
+      if (h->e_ident[5] == 0x2)
+         ENDIAN = 1;
+      header_to_little_endian(h);
+
+      fseek(file, (h->e_shoff) + (h->e_shstrndx) * sizeof(s), SEEK_SET);
+      if (!fread(s, 1, sizeof(Elf32_Shdr), file))
+      {
+         printf("Error section");
+         exit(1);
+      }
+      section_to_little_endian(s);
+      get_section_names(file);
+      if (h->e_ident[0] == 0x7f && h->e_ident[1] == 'E' && h->e_ident[2] == 'L' && h->e_ident[3] == 'F')
+      {
+         //ignore
+      }
+      else
+      {
+         printf("Not a valid ELF format.\n");
+         exit(1);
+      }
+   }
+   else
+   {
+      printf("Erreur d'ouverture du fichier\n.");
+   }
+}
+
+//almost same as get_tab_symb
+int get_tab_symb2(FILE *file, int i, Elf32_Ehdr *h, Elf32_Shdr *s)
+{
+   if (i == h->e_shnum)
+      return 0;
+   fseek(file, h->e_shoff + i * sizeof(Elf32_Shdr), SEEK_SET);
+   if(!fread(s, 1, sizeof(Elf32_Shdr), file)){
+      printf("ERREUR fread");
+      exit(1);
+   }
+   section_to_little_endian(s);
+   switch (s->sh_type)
+   {
+   case 0x0:
+      break;
+   case 0x1:
+      break;
+   case 0x2:
+      return i;
+   case 0x3:
+      break;
+   case 0x4:
+      break;
+   case 0x5:
+      break;
+   case 0x6:
+      break;
+   case 0x7:
+      break;
+   case 0x8:
+      break;
+   case 0x9:
+      break;
+   case 0x0A:
+      break;
+   default:
+      break;
+   }
+   get_tab_symb2(file, i + 1, h, s);
+}
+
+
+//retourne 1 dans le cas de definitions multiples de fonctions (sinon 0)
+
+int has_multiple_declarations(FILE *f1, FILE *f2)
+{
+   //load_data(f1);
+   int error = 0;
+
+   Elf32_Ehdr header1;
+   Elf32_Shdr section1;
+   Elf32_Sym symb1;
+
+   Elf32_Ehdr header2;
+   Elf32_Shdr section2;
+   Elf32_Sym symb2;
+
+   load_data2(f1, &header1, &section1);
+   load_data2(f2, &header2, &section2);
+
+   char *nom1 = malloc(10 * sizeof(char));
+   char *nom2 = malloc(10 * sizeof(char));
+   int pos;
+
+   int indice_tab_symb1 = get_tab_symb2(f1, 0, &header1, &section1);
+   if (indice_tab_symb1 == -1)
+   {
+      return 0;
+   }
+
+   int indice_tab_symb2 = get_tab_symb2(f2, 0, &header2, &section2);
+   if (indice_tab_symb2 == -1)
+   {
+      return 0;
+   }
+
+   fseek(f1, header1.e_shoff + indice_tab_symb1 * sizeof(section1), SEEK_SET); //on va a la section1 de la table des symboles
+   if (!fread(&section1, 1, sizeof(section1), f1))
+   {
+      printf("ERREUR fread");
+      exit(1);
+   }
+   section_to_little_endian2(&section1);
+   int count1 = section1.sh_size / section1.sh_entsize; //nombre d'entree dans la table des symboles
+   fseek(f1, section1.sh_offset, SEEK_SET);
+
+   for (int i = 0; i < count1; i++)
+   {
+      //load_data(f1);
+
+      if (!fread(&symb1, 1, sizeof(symb1), f1))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
+      symbol_to_little_endian2(&symb1);
+      nom1 = get_func_name2(f1, header1, section1.sh_link, symb1.st_name);
+      pos = ftell(f1);
+
+      fseek(f2, header2.e_shoff + indice_tab_symb2 * sizeof(section2), SEEK_SET); //on va a la section1 de la table des symboles
+      if (!fread(&section2, 1, sizeof(section2), f2))
+      {
+         printf("ERREUR fread");
+         exit(1);
+      }
+      section_to_little_endian2(&section2);
+      int count2 = section2.sh_size / section2.sh_entsize; //nombre d'entree dans la table des symboles
+
+      fseek(f2, section2.sh_offset, SEEK_SET);
+
+      for (int j = 0; j < count2; j++)
+      {
+
+         if (!fread(&symb2, 1, sizeof(symb2), f2))
+         {
+            printf("ERREUR fread");
+            exit(1);
+         }
+         symbol_to_little_endian2(&symb2);
+         nom2 = get_func_name2(f2, header2, section2.sh_link, symb2.st_name);
+         if ((strcmp(nom1, nom2) == 0) && (strcmp(nom1, "") != 0) && (nom1 != NULL) && (nom1[0] != '$'))
+         {
+            error = 1;
+            printf("ERREUR ! DEFINITION MULTIPLE DE : %s \n", nom1);
+         }
+      }
+
+      fseek(f1, pos, SEEK_SET);
+   }
+   if (error == 1)
+   {
+      return 1;
+   }
    return 0;
 }

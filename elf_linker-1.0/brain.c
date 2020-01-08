@@ -47,23 +47,7 @@ void section_to_little_endian()
    }
 }
 
-//same as section_to_little_endian
-void section_to_little_endian2(Elf32_Shdr *sec)
-{
-   if (ENDIAN == 1)
-   {
-      sec->sh_name = reverse_4(sec->sh_name);
-      sec->sh_type = reverse_4(sec->sh_type);
-      sec->sh_flags = reverse_4(sec->sh_flags);
-      sec->sh_addr = reverse_4(sec->sh_addr);
-      sec->sh_offset = reverse_4(sec->sh_offset);
-      sec->sh_size = reverse_4(sec->sh_size);
-      sec->sh_link = reverse_4(sec->sh_link);
-      sec->sh_info = reverse_4(sec->sh_info);
-      sec->sh_addralign = reverse_4(sec->sh_addralign);
-      sec->sh_entsize = reverse_4(sec->sh_entsize);
-   }
-}
+
 
 void symbol_to_little_endian()
 {
@@ -80,21 +64,7 @@ void symbol_to_little_endian()
    }
 }
 
-//same as symbol_to_little_endian
-void symbol_to_little_endian2(Elf32_Sym *sy)
-{
-   if (ENDIAN == 1)
-   {
-      sy->st_name = reverse_2(sy->st_name);
-      sy->st_value = reverse_2(sy->st_value);
-      sy->st_size = reverse_2(sy->st_size);
-      /*
-   These are already in unsigned char, can't be swapped.
-   sy->st_info = reverse_4(sy->st_info);
-   sy->st_other = reverse_4(sy->st_other);*/
-      sy->st_shndx = reverse_2(sy->st_shndx);
-   }
-}
+
 
 void rela_to_little_endian()
 {
@@ -1264,43 +1234,6 @@ int get_tab_symb(FILE *file, int i)
    get_tab_symb(file, i + 1);
 }
 
-//almost same as get_tab_symb
-int get_tab_symb2(FILE *file, int i, Elf32_Ehdr *h, Elf32_Shdr *s)
-{
-   if (i == h->e_shnum)
-      return 0;
-   fseek(file, h->e_shoff + i * sizeof(Elf32_Shdr), SEEK_SET);
-   fread(s, 1, sizeof(Elf32_Shdr), file);
-   section_to_little_endian();
-   switch (s->sh_type)
-   {
-   case 0x0:
-      break;
-   case 0x1:
-      break;
-   case 0x2:
-      return i;
-   case 0x3:
-      break;
-   case 0x4:
-      break;
-   case 0x5:
-      break;
-   case 0x6:
-      break;
-   case 0x7:
-      break;
-   case 0x8:
-      break;
-   case 0x9:
-      break;
-   case 0x0A:
-      break;
-   default:
-      break;
-   }
-   get_tab_symb2(file, i + 1, h, s);
-}
 
 char *get_func_name(FILE *f)
 {
@@ -1324,28 +1257,7 @@ char *get_func_name(FILE *f)
    return name;
 }
 
-//same as get_func_name
-char *get_func_name2(FILE *f, Elf32_Ehdr header, int sh_link, int st_name)
-{
-   Elf32_Shdr sec;
-   int pos = ftell(f);
-   char *name = malloc(10 * sizeof(char));
-   fseek(f, header.e_shoff + sh_link * header.e_shentsize, SEEK_SET);
-   fread(&sec, 1, sizeof(sec), f);
-   section_to_little_endian();
-   fseek(f, sec.sh_offset + st_name, SEEK_SET);
-   char c = fgetc(f);
-   int i = 0;
-   while (c != '\0' && i < 10)
-   {
-      name[i] = c;
-      i++;
-      c = fgetc(f);
-   }
-   name[i] = '\0';
-   fseek(f, pos, SEEK_SET);
-   return name;
-}
+
 
 void etape4(FILE *file)
 {
@@ -1526,80 +1438,3 @@ void etape5(FILE *file)
    }
 }
 
-//retourne 1 dans le cas de definitions multiples de fonctions (sinon 0)
-
-int has_multiple_declarations(FILE *f1, FILE *f2)
-{
-   //load_data(f1);
-   int error = 0;
-
-   Elf32_Ehdr header1;
-   Elf32_Shdr section1;
-   Elf32_Sym symb1;
-
-   Elf32_Ehdr header2;
-   Elf32_Shdr section2;
-   Elf32_Sym symb2;
-
-   load_data2(f1, &header1, &section1);
-   load_data2(f2, &header2, &section2);
-
-   char *nom1 = malloc(10 * sizeof(char));
-   char *nom2 = malloc(10 * sizeof(char));
-   int pos;
-
-   int indice_tab_symb1 = get_tab_symb2(f1, 0, &header1, &section1);
-   if (indice_tab_symb1 == -1)
-   {
-      return 0;
-   }
-
-   int indice_tab_symb2 = get_tab_symb2(f2, 0, &header2, &section2);
-   if (indice_tab_symb2 == -1)
-   {
-      return 0;
-   }
-
-   fseek(f1, header1.e_shoff + indice_tab_symb1 * sizeof(section1), SEEK_SET); //on va a la section1 de la table des symboles
-   fread(&section1, 1, sizeof(section1), f1);
-   section_to_little_endian2(&section1);
-   int count1 = section1.sh_size / section1.sh_entsize; //nombre d'entree dans la table des symboles
-   fseek(f1, section1.sh_offset, SEEK_SET);
-
-   for (int i = 0; i < count1; i++)
-   {
-      //load_data(f1);
-
-      fread(&symb1, 1, sizeof(symb1), f1);
-      symbol_to_little_endian2(&symb1);
-      nom1 = get_func_name2(f1, header1, section1.sh_link, symb1.st_name);
-      pos = ftell(f1);
-
-      fseek(f2, header2.e_shoff + indice_tab_symb2 * sizeof(section2), SEEK_SET); //on va a la section1 de la table des symboles
-      fread(&section2, 1, sizeof(section2), f2);
-      section_to_little_endian2(&section2);
-      int count2 = section2.sh_size / section2.sh_entsize; //nombre d'entree dans la table des symboles
-
-      fseek(f2, section2.sh_offset, SEEK_SET);
-
-      for (int j = 0; j < count2; j++)
-      {
-
-         fread(&symb2, 1, sizeof(symb2), f2);
-         symbol_to_little_endian2(&symb2);
-         nom2 = get_func_name2(f2, header2, section2.sh_link, symb2.st_name);
-         if ((strcmp(nom1, nom2) == 0) && (strcmp(nom1, "") != 0) && (nom1 != NULL)&&(nom1[0]!='$'))
-         {
-            error = 1;
-            printf("ERREUR ! DEFINITION MULTIPLE DE : %s \n", nom1);
-         }
-      }
-
-      fseek(f1, pos, SEEK_SET);
-   }
-   if (error == 1)
-   {
-      return 1;
-   }
-   return 0;
-}
