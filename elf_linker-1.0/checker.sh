@@ -11,7 +11,7 @@ option(){
     echo "Choisir une tache : "
     echo " - vérifier"
     echo " - quitter"
-    echo " - aide"
+
 }
 ######## Etape 1 ######
 etape1(){
@@ -210,7 +210,6 @@ tmp=0
 while [ $tmp -eq 0 ]
 do
     option
-    echo "Choisir une tache :"
     read tache
     if [ $tache = "vérifier" ]
     then
@@ -262,9 +261,6 @@ do
     elif [ $tache = "quitter" ]
     then
         tmp=1
-    elif [ $tache = "aide" ]
-    then
-        option
     else
         echo "mauvaise commande"
     fi
