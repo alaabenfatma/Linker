@@ -31,8 +31,6 @@ void surf_sections1()
   int i = 0;
   for (i = 0; i <= sec_1_count; i++)
   {
-    if (Sections1[i].section.sh_type != 1)
-      continue;
     printf("\nSection (%d): %s\n", i, sec_names + Sections1[i].section.sh_name);
 
     unsigned char *buff = malloc(sizeof(unsigned char) * Sections1[i].section.sh_size);
@@ -46,8 +44,6 @@ void surf_sections2()
   int i = 0;
   for (i = 0; i <= sec_2_count; i++)
   {
-    if (Sections2[i].section.sh_type != 1)
-      continue;
     printf("Section (%d): %s\n", i, sec_names + Sections2[i].section.sh_name);
 
     unsigned char *buff = malloc(sizeof(unsigned char) * Sections2[i].section.sh_size);
@@ -102,12 +98,25 @@ void fuse_sections()
         n++;
         limit++;
         }
-        
+
       }
+      else{
+        if(limit>i) continue;
+        limit++; printf("Writing section 2: %s\n", sec_names + Sections1[i].section.sh_name);
+        Pure_Sections[n].section = Sections1[i].section;
+        printbin(Sections1[i].buff,Sections1[i].section.sh_size);
+        n++;}
     }
   }
 }
-
+void append_sections_to_file(){
+  for (size_t i = 0; i < n; i++)
+  {
+    fwrite(&Pure_Sections[i].section,sizeof(Pure_Sections[i].section),1,final);
+  }
+  
+  
+}
 Elf32_Sym symb1, symb2;
 Elf32_Shdr section1, section2;
 void fuse_symbols()
@@ -242,26 +251,9 @@ int main(int argc, char *argv[])
 
   printf("\n--\n");
   fuse_sections();
+  append_sections_to_file();
   fclose(file1);
   fclose(file2);
   fclose(final);
-  FILE *fh;
-  fh = fopen("final.o", "rb");
-
-  //check if file exists
-  if (fh == NULL)
-  {
-    printf("file does not exists %s", "tmp0");
-    return 0;
-  }
-
-  //read line by line
-  const size_t line_size = 300;
-  char *line = malloc(line_size);
-  while (fgets(line, line_size, fh) != NULL)
-  {
-    printf(line);
-  }
-  free(line);
   return 0;
 }
