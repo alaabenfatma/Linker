@@ -166,6 +166,20 @@ lien_etape_4(){
     fi
     return $Flag_lien
 }
+verif_nom_etape_4(){
+    Flag_nom=0
+    list_nom1=$(./$2 -s $1| egrep "Nom" | cut -d":" -f9)
+    list_nom2=$(readelf -s $1 | sed "1,3"d | tr -s " " | cut -d" " -f9)
+    echo "$list_nom1"
+    echo "**********"
+    echo "$list_nom2"
+    echo "**********"
+    if [[ $list_nom1 != $list_nom2 ]]
+    then
+        Flag_nom=1
+    fi
+    return $Flag_nom
+}
 etape4(){
     prog=$1
     Flag_etape4=0
@@ -184,7 +198,13 @@ etape4(){
                 val_ret=$?
                 if [ $val_ret -eq 0 ]
                 then
-                    echo "G" #Vérifier nom
+                    verif_nom_etape_4 $f $prog
+                    val_ret=$?
+                    if [ $val_ret -eq 1 ]
+                    then
+                        Flag_etape4=1
+                        echo "Noms de la section mauvais"
+                    fi
                 else
                     Flag_etape4=1
                     echo "Lien de la section mauvais"
