@@ -1,5 +1,5 @@
 #include "brain.h"
-
+int ENDIAN = 0;
 //local header
 FILE *file1;
 FILE *file2;
@@ -1334,6 +1334,11 @@ void crawler(FILE *f)
    printf("\n");
 }
 
+}
+int max(int a, int b)
+{
+    a = (a > b) ? a : b;
+    return a;
 }
 int crawl(char *bin, char *tmp){
       
