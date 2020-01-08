@@ -807,17 +807,17 @@ void get_e_version2()
 
 void get_e_entry()
 {
-   printf("Adresse du point d'entrée: 0x%x \n", header.e_entry);
+   printf("Adresse du point d'entrée: 0x%lx \n", header.e_entry);
 }
 
 void get_e_phoff()
 {
-   printf("Début des en-têtes de programme : %x (octets dans le fichier)\n", header.e_phoff);
+   printf("Début des en-têtes de programme : %lx (octets dans le fichier)\n", header.e_phoff);
 }
 
 void get_e_shoff()
 {
-   printf("Début des en-têtes de section : %i (octets dans le fichier)\n", header.e_shoff);
+   printf("Début des en-têtes de section : %li (octets dans le fichier)\n", header.e_shoff);
 }
 
 void get_e_flags()
@@ -946,8 +946,8 @@ void get_sh_type()
    case 0x6fffffff:
       printf("Version symbol table.");
       break;
-      //case 0x6fffffff	: printf("Sun-specific high bound."); break;
-      //case 0x6fffffff	: printf("End OS-specific type"); break;
+      //case 0x6fffffff : printf("Sun-specific high bound."); break;
+      //case 0x6fffffff : printf("End OS-specific type"); break;
    case 0x70000000:
       printf("Start of processor-specific");
       break;
@@ -968,13 +968,16 @@ void get_sh_type()
 void get_section_names(FILE *file)
 {
    //Lire les noms of sections
+   if(ndx==1){
    sec_names = malloc(section.sh_size);
    fseek(file, section.sh_offset, SEEK_SET);
-   if (!fread(sec_names, 1, section.sh_size, file))
-   {
-      printf("Erreur fread");
-      exit(1);
-   }
+   fread(sec_names, 1, section.sh_size, file);
+}
+else{
+    sec_names2 = malloc(section.sh_size);
+   fseek(file, section.sh_offset, SEEK_SET);
+   fread(sec_names2, 1, section.sh_size, file);
+}
 }
 void etape1(FILE *f)
 {
@@ -1002,16 +1005,11 @@ void dump_sections(FILE *file, int i)
    if (i == header.e_shnum)
       return;
    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-   if (!fread(&section, 1, sizeof(section), file))
-   {
-
-      printf("Erreur fread");
-      exit(1);
-   }
+   fread(&section, 1, sizeof(section), file);
    section_to_little_endian(&section);
 
    printf("\n--- NEW section ---\n");
-   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%x\n", i, sec_names + section.sh_name, section.sh_size);
+   printf("Numéro:\t%2u \nNom:\t%s \nTaille:\t%lx\n", i, sec_names + section.sh_name, section.sh_size);
    printf("Type:\t");
    switch (section.sh_type)
    {
@@ -1054,7 +1052,7 @@ void dump_sections(FILE *file, int i)
       break;
    }
    printf("\n");
-   printf("Properties (flag %x) : ", section.sh_flags);
+   printf("Properties (flag %lx) : ", section.sh_flags);
    //Voir https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#section_header
    if (section.sh_flags & SHF_WRITE)
       printf("W");
@@ -1079,7 +1077,7 @@ void dump_sections(FILE *file, int i)
    if (section.sh_flags & SHF_EXCLUDE)
       printf("E");
    printf("\n");
-   printf("Position of section (en octets) :\t%o\n", section.sh_offset);
+   printf("Position of section (en octets) :\t%lo\n", section.sh_offset);
    printf("The section will be written in a file");
 
    dump_sections(file, i + 1);
@@ -1093,12 +1091,7 @@ void etape3(FILE *f, int x)
 {
 
    fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
-   if (!fread(&section, 1, sizeof(section), f))
-   {
-
-      printf("Erreur fread");
-      exit(1);
-   }
+   fread(&section, 1, sizeof(section), f);
    section_to_little_endian(&section);
    unsigned char *buff = malloc(sizeof(unsigned char));
    unsigned char ASCII_DUMP[HEXA];
@@ -1122,11 +1115,7 @@ void etape3(FILE *f, int x)
             if (i / 16 < section.sh_size)
             {
 
-               if (!fread(buff, sizeof(*buff), 1, f))
-               {
-                  printf("Erreur fread");
-                  exit(1);
-               }
+               fread(buff, sizeof(*buff), 1, f);
                printf("%02x", *buff);
                ASCII_DUMP[i / 16 % HEXA] = *buff;
                i += 16;
@@ -1176,14 +1165,9 @@ void etape3(FILE *f, int x)
 int get_tab_symb(FILE *file, int i)
 {
    if (i == header.e_shnum)
-      return 0;
+      return;
    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-   if (!fread(&section, 1, sizeof(section), file))
-   {
-
-      printf("Erreur fread");
-      exit(1);
-   }
+   fread(&section, 1, sizeof(section), file);
    section_to_little_endian(&section);
    switch (section.sh_type)
    {
@@ -1224,24 +1208,14 @@ void etape4(FILE *file)
       return;
    }
    fseek(file, header.e_shoff + indice_tab_symb * sizeof(section), SEEK_SET); //on va a la section de la table des symboles
-   if (!fread(&section, 1, sizeof(section), file))
-   {
-
-      printf("Erreur fread");
-      exit(1);
-   }
+   fread(&section, 1, sizeof(section), file);
    section_to_little_endian(&section);
    int count = section.sh_size / section.sh_entsize; //nombre d'entree dans la table des symboles
    printf("\nTable des symboles (section %d) à %d entrées: \n", indice_tab_symb, count);
    fseek(file, section.sh_offset, SEEK_SET);
    for (int i = 0; i < count; i++)
    {
-      if (!fread(&symb, 1, sizeof(symb), file))
-      {
-
-         printf("Erreur fread");
-         exit(1);
-      }
+      fread(&symb, 1, sizeof(symb), file);
       symbol_to_little_endian();
       printf("Num: %d |", i);
       printf("Valeur: %x |", symb.st_value);
@@ -1324,8 +1298,8 @@ void etape4(FILE *file)
       case SHN_UNDEF:
          printf("Ndx: UND |");
          break; /* Undefined section */
-      //case SHN_LORESERVE:	printf("Ndx : LORESERVE |");break;	/* Start of reserved indices */
-      //case SHN_LOPROC:      printf("Ndx : LOPROC |");break;	/* Start of processor-specific */
+      //case SHN_LORESERVE:   printf("Ndx : LORESERVE |");break;  /* Start of reserved indices */
+      //case SHN_LOPROC:      printf("Ndx : LOPROC |");break;  /* Start of processor-specific */
       case SHN_BEFORE:
          printf("Ndx: BEFORE |");
          break; /* Order section before all others (Solaris).  */
@@ -1347,7 +1321,7 @@ void etape4(FILE *file)
       case SHN_COMMON:
          printf("Ndx: COMMON |");
          break; /* Associated symbol is common */
-      //case SHN_XINDEX:	printf("Ndx : XINDEX |");break;	/* Index is in extra table.  */
+      //case SHN_XINDEX:   printf("Ndx : XINDEX |");break;  /* Index is in extra table.  */
       case SHN_HIRESERVE:
          printf("Ndx: HIRESERVE |");
          break; /* End of reserved indices */
@@ -1364,12 +1338,7 @@ void etape5(FILE *file)
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-      if (!fread(&section, 1, sizeof(section), file))
-      {
-
-         printf("Erreur fread");
-         exit(1);
-      }
+      fread(&section, 1, sizeof(section), file);
       section_to_little_endian(&section);
       if (section.sh_type == 4 || section.sh_type == 9)
       {
@@ -1380,33 +1349,24 @@ void etape5(FILE *file)
          {
             if (section.sh_type == 4)
             {
-               if (!fread(&rela, 1, sizeof(rela), file))
-               {
-
-                  printf("Erreur fread");
-                  exit(1);
-               }
+               fread(&rela, 1, sizeof(rela), file);
                rela_to_little_endian();
-               printf("Decalage: %x |", rela.r_offset);
+               printf("Decalage: %llx |", rela.r_offset);
                printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
                printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
             }
             if (section.sh_type == 9)
             {
-               if (!fread(&rel, 1, sizeof(rel), file))
-               {
-
-                  printf("Erreur fread");
-                  exit(1);
-               }
+               fread(&rel, 1, sizeof(rel), file);
                rel_to_little_endian();
-               printf("Decalage: %x |", rel.r_offset);
+               printf("Decalage: %llx |", rel.r_offset);
                printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
             }
          }
       }
    }
-}void crawler(FILE *f)
+}
+void crawler(FILE *f)
 {
 
    unsigned char *buff = malloc(sizeof(unsigned char));
@@ -1455,18 +1415,18 @@ int max(int a, int b)
 int crawl(char *bin, char *tmp)
 {
 
-   file1 = fopen(bin, "rb");
-   file2 = fopen(tmp, "wb");
+   file1 = fopen(bin, "r");
+   file2 = fopen(tmp, "w");
    etape1(file1);
    etape2(file1);
    if (ndx == 1)
    {
-      Sections1 = malloc(sizeof(Elf32_Shdr) * header.e_shnum);
+      Sections1 = malloc(sizeof(Pure_Section) * header.e_shnum);
       sec_1_count = header.e_shnum;
    }
    else
    {
-      Sections2 = malloc(sizeof(Elf32_Shdr) * header.e_shnum);
+      Sections2 = malloc(sizeof(Pure_Section) * header.e_shnum);
       sec_2_count = header.e_shnum;
    }
    crawler(file1);
