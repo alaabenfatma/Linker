@@ -10,6 +10,7 @@ char *sec_names = NULL;
 char *symb_names = NULL;
 int ENDIAN = 0; //var globale => 0 = little | 1 = bug
 int isLoaded = 0;
+int r;
 
 void header_to_little_endian()
 {
@@ -107,10 +108,9 @@ void load_data(FILE *file)
    isLoaded = 1;
    if (file)
    {
-      if (!fread(&header, 1, sizeof(header), file))
-      {
-         printf("Error header");
-         exit(1);
+      r = fread(&header, 1, sizeof(header), file);
+      if(r != sizeof(header)){
+            //ignore
       }
       //ENDIANESS!!
       if (header.e_ident[5] == 0x2)
@@ -118,10 +118,9 @@ void load_data(FILE *file)
       header_to_little_endian();
 
       fseek(file, (header.e_shoff) + (header.e_shstrndx) * sizeof(section), SEEK_SET);
-      if (!fread(&section, 1, sizeof(section), file))
-      {
-         printf("Error section");
-         exit(1);
+      r = fread(&section, 1, sizeof(section), file);
+      if(r != sizeof(section)){
+            //ignore
       }
       section_to_little_endian();
       get_section_names(file);
@@ -147,10 +146,9 @@ void load_data2(FILE *file, Elf32_Ehdr *h, Elf32_Shdr *s)
    //isLoaded = 1;
    if (file)
    {
-      if (!fread(h, 1, sizeof(Elf32_Ehdr), file))
-      {
-         printf("Error header");
-         exit(1);
+      r = fread(h, 1, sizeof(Elf32_Ehdr), file);
+      if(r != sizeof(Elf32_Ehdr)){
+            //ignore
       }
       //ENDIANESS!!
       if (h->e_ident[5] == 0x2)
@@ -158,10 +156,9 @@ void load_data2(FILE *file, Elf32_Ehdr *h, Elf32_Shdr *s)
       header_to_little_endian();
 
       fseek(file, (h->e_shoff) + (h->e_shstrndx) * sizeof(s), SEEK_SET);
-      if (!fread(s, 1, sizeof(Elf32_Shdr), file))
-      {
-         printf("Error section");
-         exit(1);
+      r = fread(s, 1, sizeof(Elf32_Shdr), file);
+      if(r != sizeof(Elf32_Shdr)){
+            //ignore
       }
       section_to_little_endian();
       get_section_names(file);
@@ -1018,9 +1015,9 @@ void get_section_names(FILE *file)
    //Lire les noms of sections
    sec_names = malloc(section.sh_size);
    fseek(file, section.sh_offset, SEEK_SET);
-   if(!fread(sec_names, 1, section.sh_size, file)){
-      printf("ERROR fread");
-      exit(1);
+   r = fread(sec_names, 1, section.sh_size, file);
+   if(r != section.sh_size){
+            //ignore
    }
 }
 void etape1(FILE *f)
@@ -1055,9 +1052,9 @@ void dump_sections(FILE *file, int i)
    if (i == header.e_shnum)
       return;
    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-   if(!fread(&section, 1, sizeof(section), file)){
-      printf("ERROR fread");
-      exit(1);
+   r = fread(&section, 1, sizeof(section), file);
+   if(r != sizeof(section)){
+            //ignore
    }
    section_to_little_endian();
    printf("\n--- NEW SECTION ---\n");
@@ -1149,9 +1146,9 @@ void etape3(FILE *f, int x)
       load_data(f);
    }
    fseek(f, header.e_shoff + x * sizeof(section), SEEK_SET);
-   if(!fread(&section, 1, sizeof(section), f)){
-      printf("ERROR fread");
-      exit(1);
+   r = fread(&section, 1, sizeof(section), f);
+   if(r != sizeof(section)){
+            //ignore
    }
    section_to_little_endian();
    unsigned char *buff = malloc(sizeof(unsigned char));
@@ -1176,9 +1173,9 @@ void etape3(FILE *f, int x)
             if (i / 16 < section.sh_size)
             {
 
-               if(!fread(buff, sizeof(*buff), 1, f)){
-                  printf("ERROR fread");
-                  exit(1);
+               r = fread(buff, sizeof(*buff), 1, f);
+               if(r != 1){
+                  //ignore
                }
                printf("%02x", *buff);
                ASCII_DUMP[i / 16 % HEXA] = *buff;
@@ -1231,9 +1228,9 @@ int get_tab_symb(FILE *file, int i)
    if (i == header.e_shnum)
       return 0;
    fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-   if(!fread(&section, 1, sizeof(section), file)){
-      printf("ERROR fread");
-      exit(1);
+   r = fread(&section, 1, sizeof(section), file);
+   if(r != sizeof(section)){
+            //ignore
    }
    section_to_little_endian();
    switch (section.sh_type)
@@ -1273,9 +1270,9 @@ char *get_func_name(FILE *f)
    int pos = ftell(f);
    char *name = malloc(10 * sizeof(char));
    fseek(f, header.e_shoff + section.sh_link * header.e_shentsize, SEEK_SET);
-   if(!fread(&sec, 1, sizeof(sec), f)){
-      printf("ERROR fread");
-      exit(1);
+   r = fread(&sec, 1, sizeof(sec), f);
+   if(r != sizeof(sec)){
+            //ignore
    }
    section_to_little_endian2(&sec);
    fseek(f, sec.sh_offset + symb.st_name, SEEK_SET);
@@ -1308,9 +1305,9 @@ void etape4(FILE *file)
       return;
    }
    fseek(file, header.e_shoff + indice_tab_symb * sizeof(section), SEEK_SET); //on va a la section de la table des symboles
-   if(!fread(&section, 1, sizeof(section), file)){
-      printf("ERROR fread");
-      exit(1);
+   r = fread(&section, 1, sizeof(section), file);
+   if(r != sizeof(section)){
+            //ignore
    }
    section_to_little_endian();
    int count = section.sh_size / section.sh_entsize; //nombre d'entree dans la table des symboles
@@ -1318,9 +1315,9 @@ void etape4(FILE *file)
    fseek(file, section.sh_offset, SEEK_SET);
    for (int i = 0; i < count; i++)
    {
-      if(!fread(&symb, 1, sizeof(symb), file)){
-          printf("ERROR fread");
-          exit(1);
+      r = fread(&symb, 1, sizeof(symb), file);
+      if(r != sizeof(symb)){
+            //ignore
       }
 
       symbol_to_little_endian();
@@ -1446,45 +1443,43 @@ void etape4(FILE *file)
 
 void etape5(FILE *file)
 {
+   if (isLoaded == 0)
+   {
+      load_data(file);
+   }
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-      if (!fread(&section, 1, sizeof(section), file))
-      {
-         printf("ERREUR fread");
-         exit(1);
+      r = fread(&section, sizeof(section), 1, file);
+      if(r != 1){
+            //ignore
       }
-      section_to_little_endian(&section);
-      if (section.sh_type == 4 || section.sh_type == 9)
+      section_to_little_endian();
+      if (section.sh_type & 0x4 || section.sh_type & 0x9)
       {
-         int count = section.sh_size / section.sh_entsize;
-         printf("\nsection de redressage numéro : %d\n", i);
+         //int count = section.sh_size % section.sh_entsize;
+         printf("\nSection de redressage numéro : %d\n", i);
          fseek(file, section.sh_offset, SEEK_SET);
-         for (int j = 0; j < count; j++)
+         if (section.sh_type & 0x4)
          {
-            if (section.sh_type == 4)
-            {
-               if (!fread(&rela, 1, sizeof(rela), file))
-               {
-                  printf("ERREUR fread");
-                  exit(1);
-               }
-               rela_to_little_endian();
-               printf("Decalage: %x |", rela.r_offset);
-               printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
-               printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
+            r = fread(&rela, 1, sizeof(rela), file);
+            if(r != sizeof(rela)){
+                  //ignore
             }
-            if (section.sh_type == 9)
-            {
-               if (!fread(&rel, 1, sizeof(rel), file))
-               {
-                  printf("ERREUR fread");
-                  exit(1);
-               }
-               rel_to_little_endian();
-               printf("Decalage: %x |", rel.r_offset);
-               printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
+            rela_to_little_endian();
+            printf("Decalage: %x |", rela.r_offset);
+            printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
+            printf("Index: %d\n", ELF32_R_SYM(rela.r_info));
+         }
+         if (section.sh_type & 0x9)
+         {
+            r = fread(&rel, 1, sizeof(rel), file);
+            if(r != sizeof(rel)){
+                  //ignore
             }
+            rel_to_little_endian();
+            printf("Decalage: %x |", rel.r_offset);
+            printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
          }
       }
    }
