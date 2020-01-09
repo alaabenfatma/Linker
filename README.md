@@ -61,7 +61,7 @@ xxd fichier.o
 # Schéma de la structure du code
 ![Alt Text](https://github.com/alaabenfatma/Linker/blob/master/Untitled%20Diagram.png)
 
-###LECTURE ELF
+### LECTURE ELF
 
 Pour ces étapes l'utilisateur rentre dans le terminal la commande qu'il souhaite executer :
 ./elf_dumper -h fichier.o   affiche le header
