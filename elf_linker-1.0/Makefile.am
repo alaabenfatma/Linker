@@ -19,8 +19,7 @@ bin_PROGRAMS=
 bin_PROGRAMS+=ARM_runner_example
 
 
-COMMON=debug.h debug.c util.h util.c elf_dumper.c brain.c godbolt.c fuse.c
-
+See the compte rendu for more details about each TARGET
 EXTRA_DIST=filtre.pl
 SIMULATOR_INTERFACE=csapp.h csapp.c scanner.h scanner.l  brain.h gdb_protocol.h gdb_protocol.c arm_simulator_interface.h arm_simulator_interface.c
 
