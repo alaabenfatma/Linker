@@ -15,7 +15,7 @@ option(){
 ######## Etape 1 ######
 etape1(){
     Flag_etape1=0
-    for f in Examples_loader/*.o
+    for f in examples/*.o
     do
         echo "*******************************************"
         echo "ETAPE 1 :"
@@ -81,7 +81,7 @@ verif_type(){
 etape2(){
     prog=$1
     Flag_etape2=0
-    for f in Examples_loader/*.o
+    for f in examples/*.o
     do
         echo "*******************************************"
         echo "ETAPE 2 :"
@@ -180,7 +180,7 @@ verif_nom_etape_4(){
 etape4(){
     prog=$1
     Flag_etape4=0
-    for f in Examples_loader/*.o
+    for f in examples/*.o
     do
         echo "*******************************************"
         echo "ETAPE 4 :"
@@ -228,7 +228,7 @@ etape4(){
 ######## Etape 5 ######
 
 etape5(){
-    for f in Examples_loader/*.o
+    for f in examples/*.o
     do
     echo "*******************************************"
     echo "ETAPE 5 :"
