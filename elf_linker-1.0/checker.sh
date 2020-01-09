@@ -134,13 +134,13 @@ nombre_de_section(){
     Flag_nb_section=0
     first=$(./$2 -s $1 | sed '1,2'd | wc -l )
     nb_entree=$(./$2 -s $1 | egrep "Table des symboles" | cut -d" " -f7)
-    if [ $first -ne $nb_entree ]
+    if [[ $first -ne $nb_entree ]]
     then
         Flag_nb_section=1
         #nombre d'entrée de la tables des symboles différent"
     else
         second=$(readelf -s $1 | egrep "La table de symboles" | cut -d" " -f7)
-        if [ $first -ne $second ]
+        if [[ $first -ne $second ]]
         then
            Flag_nb_section=1 
         fi
@@ -234,7 +234,7 @@ etape5(){
     echo "ETAPE 5 :"
     echo "Testing the file : $f"
     first=$(./$1 -r $f)
-    if [ -z $first ]
+    if [[ -z $first ]]
     then
         second=$(readelf -r $f | sed "1,1"d)
         test="Il n'y a pas de réadressage dans ce fichier."
