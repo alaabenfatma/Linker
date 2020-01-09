@@ -1,0 +1,44 @@
+------------------------------------------------------------LECTURE ELF-----------------------------------------------
+
+Pour ces étapes l'utilisateur rentre dans le terminal la commande qu'il souhaite executer :
+./elf_dumper -h fichier.o   affiche le header
+./elf_dumper -S fichier.o   affiche les entetes de sections
+./elf_dumper -s fichier.o   affiche la table des symboles
+./elf_dumper -x fichier.o   affiche le hontenu d'une section
+./elf_dumper -r fichier.o   affiche les tables de redressage
+
+
+Etape 1 :
+-Affichage de toutes les informations contenues dans le header.
+
+Etape 2 :
+-Affichage dans le terminal de chaque section du fichier elf :
+--- NEW SECTION ---
+Numéro :
+Nom :
+.
+.
+.
+
+Etape 3 : 
+-Affiche le contenu de la section donnée en entrée dans le terminal
+
+Etape 4 :
+-Affichage de la table des symboles et son nombre d'entrées, pour chaque symbole affiche : son numéro, son nom, sa valeur, sa taille ect.
+
+Etape 5 :
+-Affiche les tables de redressage et leur contenu.
+Ne fonctionne que sur le little endian (probleme avec le big endian pas eu le temps de le corriger)
+
+
+------------------------------------------------------------FUSION-----------------------------------------------
+
+
+Etape 6 :
+-Fusionne les sections PROGBITS des deux fichiers d'entrée et les fusionne dans un fichier de sortie.
+
+Etape 7:
+-Capable de verifier les symboles des sections et de ne recuperer que les symboles a mettre dans la table du fichier de sortie.
+Probleme pour les ecrire dans le fichier.
+
+Etape 8, 9 : Non réalisées.
