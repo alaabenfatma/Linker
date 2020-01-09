@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
   Pure_Sections = malloc(sizeof(Pure_Section) * max(sec_1_count, sec_2_count));
   ndx = 1;
   crawl(argv[1], "tmp0");
-  final = fopen("final.o", "wb");
+  final = fopen(argv[3], "wb");
   ndx = 2;
   crawl(argv[2], "tmp1");
   file1 = fopen(argv[1], "rb");
