@@ -47,6 +47,23 @@ void section_to_little_endian()
    }
 }
 
+void section_to_little_endian2(Elf32_Shdr* sec)
+{
+   if (ENDIAN == 1)
+   {
+      sec->sh_name = reverse_4(sec->sh_name);
+      sec->sh_type = reverse_4(sec->sh_type);
+      sec->sh_flags = reverse_4(sec->sh_flags);
+      sec->sh_addr = reverse_4(sec->sh_addr);
+      sec->sh_offset = reverse_4(sec->sh_offset);
+      sec->sh_size = reverse_4(sec->sh_size);
+      sec->sh_link = reverse_4(sec->sh_link);
+      sec->sh_info = reverse_4(sec->sh_info);
+      sec->sh_addralign = reverse_4(sec->sh_addralign);
+      sec->sh_entsize = reverse_4(sec->sh_entsize);
+   }
+}
+
 
 
 void symbol_to_little_endian()
@@ -1242,7 +1259,7 @@ char *get_func_name(FILE *f)
    char *name = malloc(10 * sizeof(char));
    fseek(f, header.e_shoff + section.sh_link * header.e_shentsize, SEEK_SET);
    fread(&sec, 1, sizeof(sec), f);
-   section_to_little_endian();
+   section_to_little_endian2(&sec);
    fseek(f, sec.sh_offset + symb.st_name, SEEK_SET);
    char c = fgetc(f);
    int i = 0;
