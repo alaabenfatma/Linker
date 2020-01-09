@@ -27,7 +27,7 @@ La variable TARGET doit être remplacée par l'une des options suivantes
 
 Voir le compte rendu pour plus de détails sur chaque TARGET.
 
-### Exemples
+### Examples
 Tous les exemples sont contenus dans le dossier *exemples*.
 
 cmd:
@@ -52,4 +52,8 @@ Un exemple sur le fonctionnement de la fusion
 ```
 ./fuse examples
 ```
+Afin de vérifier le contenu du fichier et vérifier les résultats, utilisez la commande *xxd*
 
+```
+xxd fichier.o
+```
