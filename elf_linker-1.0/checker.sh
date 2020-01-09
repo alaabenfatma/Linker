@@ -1,23 +1,24 @@
-Tests=("Examples_loader/example1.o" "Examples_loader/example2.o")
 affiche_etape(){
     echo "Choisir une Etape à vérifier: "
     echo "  1 - Etape 1    5 - Etape 5"
     echo "  2 - Etape 2    6 - Tout"
-    echo "  3 - Etape 3    7 - afficher choix"
-    echo "  4 - Etape 4    8 - fin"
+    echo "  3 - Etape 3    7 - fin"
+    echo "  4 - Etape 4"
     echo "Etape à vérifier:"
 }
 option(){
     echo "Choisir une tache : "
-    echo " - vérifier"
-    echo " - quitter"
+    echo "1 - vérifier"
+    echo "2 - quitter"
 
 }
 ######## Etape 1 ######
 etape1(){
     Flag_etape1=0
-    for f in "${Tests[@]}"; do
+    for f in Examples_loader/*.o
+    do
         echo "*******************************************"
+        echo "ETAPE 1 :"
         echo "Testing the file : $f"
         first=$(readelf -h $f | egrep "Magique|Magic" | tr -d "\n\t ")
         second=$(./$1 -h $f | egrep "Magique|Magic" | tr -d "\n\t ")
@@ -80,8 +81,10 @@ verif_type(){
 etape2(){
     prog=$1
     Flag_etape2=0
-    for f in "${Tests[@]}"; do
+    for f in Examples_loader/*.o
+    do
         echo "*******************************************"
+        echo "ETAPE 2 :"
         echo "Testing the file : $f"
         verif_nb_ligne $f $prog
         val_ret=$?
@@ -120,11 +123,9 @@ etape2(){
 
 
 etape3(){
-    prog=$1
-    Flag_etape3=0
-    for f in "${Tests[@]}"; do
-        echo
-    done
+    echo "*******************************************"
+    echo "ETAPE 3 :"
+    echo "Aucune vérification n'a pu être automatisée"
 }
 
 #######################
@@ -168,12 +169,8 @@ lien_etape_4(){
 }
 verif_nom_etape_4(){
     Flag_nom=0
-    list_nom1=$(./$2 -s $1| egrep "Nom" | cut -d":" -f9)
-    list_nom2=$(readelf -s $1 | sed "1,3"d | tr -s " " | cut -d" " -f9)
-    echo "$list_nom1"
-    echo "**********"
-    echo "$list_nom2"
-    echo "**********"
+    list_nom1=$(./$2 -s $1| egrep "Nom" | cut -d":" -f9 | tr -d " \n")
+    list_nom2=$(readelf -s $1 | sed "1,3"d | tr -s " " | cut -d" " -f9 | tr -d "\n"  )
     if [[ $list_nom1 != $list_nom2 ]]
     then
         Flag_nom=1
@@ -183,8 +180,10 @@ verif_nom_etape_4(){
 etape4(){
     prog=$1
     Flag_etape4=0
-    for f in "${Tests[@]}"; do
+    for f in Examples_loader/*.o
+    do
         echo "*******************************************"
+        echo "ETAPE 4 :"
         echo "Testing the file : $f"
         nombre_de_section $f $prog
         val_ret=$?
@@ -226,6 +225,37 @@ etape4(){
     done
 }
 #######################
+######## Etape 5 ######
+
+etape5(){
+    for f in Examples_loader/*.o
+    do
+    echo "*******************************************"
+    echo "ETAPE 5 :"
+    echo "Testing the file : $f"
+    first=$(./$1 -r $f)
+    if [ -z $first ]
+    then
+        second=$(readelf -r $f | sed "1,1"d)
+        test="Il n'y a pas de réadressage dans ce fichier."
+        if [[ $second == $test ]]
+        then
+            echo "GOOD TEST"
+        fi
+    fi
+    done
+}
+
+#######################
+######## Etape 6 ######
+ensemble(){
+    etape1 $1
+    etape2 $1
+    etape3 $1
+    etape4 $1
+    etape5 $1
+}
+#######################
 ######## MAIN #########
 tmp=0
 
@@ -233,7 +263,7 @@ while [ $tmp -eq 0 ]
 do
     option
     read tache
-    if [ $tache = "vérifier" ]
+    if [ $tache = "1" ]
     then
         echo "nom du programme : "
         read programme;
@@ -269,21 +299,27 @@ do
                     read no_etape;
                     ;;
                     5)
-                    etape5
+                    etape5 $programme
+                    echo "*******************************************"
+                    affiche_etape
+                    read no_etape;
                     ;;
                     6)
-                    ensemble
+                    ensemble $programme
+                    echo "*******************************************"
+                    affiche_etape
+                    read no_etape;
                     ;;
                     7)
-                    affiche_etape
-                    ;;
-                    8)
                     tmp2=1
                     ;;
                     *)
+                    echo "Erreur de saisie"
+                    break
+                    ;;
             esac
         done
-    elif [ $tache = "quitter" ]
+    elif [ $tache = "2" ]
     then
         tmp=1
     else
