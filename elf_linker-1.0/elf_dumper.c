@@ -1,5 +1,4 @@
-#include "brain.h"
-#include <string.h>
+#include "brain.c"
 
 void displayHelp(){
    printf("-h \t Display the ELF file header \n");
@@ -57,7 +56,10 @@ int main(int argc, char *argv[])
    if(isPresent("-x",argc,argv)){
       printf("Entrer le numero de section: ");
       int x = 0;
-      scanf("%d", &x);
+      if(!scanf("%d", &x)){
+          printf("ERROR scanf");
+          exit(1);
+      }
       printf("Section number : ");
       etape3(file,x);
    }
