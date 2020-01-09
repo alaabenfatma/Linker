@@ -1443,43 +1443,50 @@ void etape4(FILE *file)
 
 void etape5(FILE *file)
 {
-   if (isLoaded == 0)
+   if(!fread(&header, 1, sizeof(header), file))
    {
-      load_data(file);
+      printf("ERREUR fread");
+      exit(1);
    }
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
-      r = fread(&section, sizeof(section), 1, file);
-      if(r != 1){
-            //ignore
+      if (!fread(&section, 1, sizeof(section), file))
+      {
+         printf("ERREUR fread");
+         exit(1);
       }
       section_to_little_endian();
-      if (section.sh_type & 0x4 || section.sh_type & 0x9)
+      if (section.sh_type == 4 || section.sh_type == 9)
       {
-         //int count = section.sh_size % section.sh_entsize;
-         printf("\nSection de redressage numéro : %d\n", i);
+         int count = section.sh_size / section.sh_entsize;
+         printf("\nsection de redressage numéro : %d\n", i);
          fseek(file, section.sh_offset, SEEK_SET);
-         if (section.sh_type & 0x4)
+         for (int j = 0; j < count; j++)
          {
-            r = fread(&rela, 1, sizeof(rela), file);
-            if(r != sizeof(rela)){
-                  //ignore
+            if (section.sh_type == 4)
+            {
+               if (!fread(&rela, 1, sizeof(rela), file))
+               {
+                  printf("ERREUR fread");
+                  exit(1);
+               }
+               rela_to_little_endian();
+               printf("Decalage: %x |", rela.r_offset);
+               printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
+               printf("Index: %x\n", ELF32_R_SYM(rela.r_info));
             }
-            rela_to_little_endian();
-            printf("Decalage: %x |", rela.r_offset);
-            printf("Type: %x |", ELF32_R_TYPE(rela.r_info));
-            printf("Index: %d\n", ELF32_R_SYM(rela.r_info));
-         }
-         if (section.sh_type & 0x9)
-         {
-            r = fread(&rel, 1, sizeof(rel), file);
-            if(r != sizeof(rel)){
-                  //ignore
+            if (section.sh_type == 9)
+            {
+               if (!fread(&rel, 1, sizeof(rel), file))
+               {
+                  printf("ERREUR fread");
+                  exit(1);
+               }
+               rel_to_little_endian();
+               printf("Decalage: %x |", rel.r_offset);
+               printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
             }
-            rel_to_little_endian();
-            printf("Decalage: %x |", rel.r_offset);
-            printf("Type: %x\n", ELF32_R_TYPE(rel.r_info));
          }
       }
    }
