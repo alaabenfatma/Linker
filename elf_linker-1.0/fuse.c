@@ -101,7 +101,7 @@ void fuse_sections()
           limit++;
         }
       }
-      else
+      /*else
       {
         if (limit >= i)
           continue;
@@ -112,7 +112,7 @@ void fuse_sections()
         Pure_Sections[n].section = Sections1[i].section;
         printbin(Sections1[i].buff, Sections1[i].section.sh_size);
         n++;
-      }
+      }*/
     }
   }
 }
@@ -125,11 +125,23 @@ void append_sections_to_file()
 }
 Elf32_Sym *symbols;
 Elf32_Shdr section1, section2;
-void append_symbol(Elf32_Sym s)
+
+void append_symbol(Elf32_Sym s, FILE *f,Elf32_Ehdr h, Elf32_Shdr sec)
 {
   symbols[symb_n] = s;
   symb_n++;
+  char *name =   get_func_name2(f,h,sec.sh_link,s.st_name);
+  printf("%s \n",name);
+  printbin(name,strlen(name));
 }
+
+int exist_symbol(Elf32_Sym s){
+  for (int i = 0; i < symb_n ; i++) {
+    if (symbols[i].st_name == s.st_name) return 1;
+  }
+  return 0;
+}
+
 void fuse_symbols()
 {
   int indice_tab_symb1 = get_tab_symb(file1, 0);
@@ -157,12 +169,13 @@ void fuse_symbols()
   symbols = malloc(sizeof(Elf32_Sym) * max(count1, count2));
   fseek(file1, section1.sh_offset, SEEK_SET);
   fseek(file2, section2.sh_offset, SEEK_SET);
+  Elf32_Sym symb1, symb2;
 
   for (int i = 0; i < count1; i++)
   {
-    for (int i = 0; i < count2; i++)
+    for (int j = 0; j < count2; j++)
     {
-      Elf32_Sym symb1, symb2;
+
       fread(&symb1, 1, sizeof(symb1), file1);
       symbol_to_little_endian();
       fread(&symb2, 1, sizeof(symb2), file2);
@@ -177,18 +190,18 @@ void fuse_symbols()
           if (symb1.st_name == symb2.st_name)
           {
             //alors on ecrit que le symb1 dans la table resultat s'il n'y est pas deja
-            append_symbol(symb1);
+            if (!exist_symbol(symb1)) append_symbol(symb1, file1, header, section1);
           }
           else
           {
             // on ecrit le symb1 et le symb2 dans la table resultat s'il n'y sont pas deja
-            append_symbol(symb1);
-            append_symbol(symb2);
+            if (!exist_symbol(symb1)) append_symbol(symb1, file1, header, section1);
+            if (!exist_symbol(symb2)) append_symbol(symb2, file2, header, section2);
           }
           break;
         case STB_GLOBAL:
           //on ecrit le symb1 dans la table resultat s'il n'y est pas deja
-          append_symbol(symb1);
+          if (!exist_symbol(symb1)) append_symbol(symb1, file1, header, section1);
           break;
         }
         break;
@@ -201,7 +214,7 @@ void fuse_symbols()
         {
         case STB_LOCAL:
           //on ecrit le symb1 dans la table resultat s'il n'y est pas deja
-          append_symbol(symb1);
+          if (!exist_symbol(symb2)) append_symbol(symb2, file2, header, section2);
           break;
         case STB_GLOBAL:
           if (symb1.st_name == symb2.st_name)
@@ -209,29 +222,29 @@ void fuse_symbols()
             if (symb1.st_shndx == symb2.st_shndx && symb2.st_shndx != SHN_UNDEF)
             {
               //l'edition de lien echoue completement
-              printf("ERROR SAME NAME.");
+              printf("ERROR SAME NAME\n");
               exit(1);
             }
             if (symb1.st_shndx == SHN_UNDEF && symb2.st_shndx != SHN_UNDEF)
             {
               //on ecrit le symb2 qui porte la definition
-              append_symbol(symb2);
+              if (!exist_symbol(symb2)) append_symbol(symb2, file2, header, section2);
             }
             if (symb2.st_shndx == SHN_UNDEF && symb1.st_shndx != SHN_UNDEF)
             {
               //on ecrit le symb1 qui porte la definition
-              append_symbol(symb1);
+              if (!exist_symbol(symb1)) append_symbol(symb1, file1, header, section1);
             }
             if (symb2.st_shndx == SHN_UNDEF && symb1.st_shndx == SHN_UNDEF)
             {
               //on ecrit l'un des deux symboles au choix
-              append_symbol(symb1);
+              if (!exist_symbol(symb1)) append_symbol(symb1, file1, header, section1);
             }
           }
           else
           {
             //on ecrit le symb1
-            append_symbol(symb1);
+            if (!exist_symbol(symb1)) append_symbol(symb1, file1, header, section1);
           }
           break;
         }
@@ -253,7 +266,7 @@ void fuse_symbols()
         */
     }
   }
-  fwrite(&symbols, sizeof(symbols), 1, final);
+  //fwrite(&symbols, sizeof(symbols), 1, final);
 }
 
 int main(int argc, char *argv[])
