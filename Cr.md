@@ -21,7 +21,7 @@ Nom :
 .
 
 Etape 3 : 
--Affiche le contenu de la section donnée en entrée dans le terminal
+-Affiche le contenu de la section donnée par son numéro en entrée dans le terminal
 
 Etape 4 :
 -Affichage de la table des symboles et son nombre d'entrées, pour chaque symbole affiche : son numéro, son nom, sa valeur, sa taille ect.
