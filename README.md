@@ -7,9 +7,10 @@ Ce projet nous permet de faire l'édition de liens de fichiers .o
 Afin de configurer le _Makefile_, nous devons exécuter cette commande :
 
 ```
-autoreconf
+./configure
+automake
 ```
-De plus, nous devons ajouter ou modifier cette ligne dans le Makefile lui-même.
+De plus, nous devons ajouter ou modifier cette ligne dans le Makefile lui-même. __On n'est pas sûr__
 
 ```
 COMMON=debug.h debug.c util.h util.c brain.h  elf_dumper.c brain.c crawler.c fuse.c
@@ -71,10 +72,10 @@ Pour ces étapes l'utilisateur rentre dans le terminal la commande qu'il souhait
 ./elf_dumper -r fichier.o   affiche les tables de redressage
 
 
-Etape 1 :
+#### Etape 1 :
 -Affichage de toutes les informations contenues dans le header.
 
-Etape 2 :
+#### Etape 2 :
 -Affichage dans le terminal de chaque section du fichier elf :
 --- NEW SECTION ---
 Numéro :
@@ -83,43 +84,43 @@ Nom :
 .
 .
 
-Etape 3 : 
+#### Etape 3 : 
 -Affiche le contenu de la section donnée par son numéro en entrée dans le terminal
 
-Etape 4 :
+#### Etape 4 :
 -Affichage de la table des symboles et son nombre d'entrées, pour chaque symbole affiche : son numéro, son nom, sa valeur, sa taille ect.
 
-Etape 5 :
+#### Etape 5 :
 -Affiche les tables de redressage et leur contenu.
 Ne fonctionne que sur le little endian (probleme avec le big endian pas eu le temps de le corriger)
 
 
-------------------------------------------------------------FUSION-----------------------------------------------
+### FUSION
 
 
-Etape 6 :
+#### Etape 6 :
 -Fusionne les sections PROGBITS des deux fichiers d'entrée et les fusionne dans un fichier de sortie.
 
-Etape 7:
+#### Etape 7:
 -Capable de verifier les symboles des sections et de ne recuperer que les symboles a mettre dans la table du fichier de sortie.
 Probleme pour les ecrire dans le fichier.
 
-Etape 8, 9 : Non réalisées.
+#### Etape 8, 9 : Non réalisées.
 Partie sur les tests:
   Afin de vérifier les bons résultats du programme, nous avons implémenté un programme Bash ( checker.sh )
 qui va comparer le résultat avec celui de readelf. Chaque étape peut être vérifiée indépendamment et si 
 jamais le résultat de elf_dumper n’est pas correct, le programme nous indique de quelle différence il s’agit.  
 
-----------------------------------------------Journal de bord---------------------------------------------------
+### JOURNAL DE BORD
 
-Semaine 1 : du 12 au 20 décembre 2019
+#### Semaine 1 : du 12 au 20 décembre 2019
 - Lecture du sujet, prise en main des fichiers fournis.
 - Implémentation de la phase 1 : étape 1, 2,3,5 et partie 4 incomplète (fichier elf_dumper).
 - Implémentation des tests (checker.sh) de l’étape 1, 2.
 - Début de la phase 2(fichiers crawler.c et fuse.c).
 
-Semaine 2 : du 6 au 12 Janvier 2020
- -Continuation de la phase 1 : Ajout du nom des fonctions dans l’affichage d’une section de l’étape 4.
+#### Semaine 2 : du 6 au 12 Janvier 2020
+- Continuation de la phase 1 : Ajout du nom des fonctions dans l’affichage d’une section de l’étape 4.
 - Correction des bugs de l’étape 5.
 - Continuation de la phase 2: Etape 6 et Etape 7.
 - Implémentation des tests ( checker.sh ) de l’étape 4. 
