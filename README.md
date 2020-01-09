@@ -29,11 +29,11 @@ La variable TARGET doit être remplacée par l'une des options suivantes
 Voir le compte rendu pour plus de détails sur chaque TARGET.
 
 ### Exemples
-Tous les exemples sont contenus dans le dossier *exemples*.
+Tous les exemples sont contenus dans le dossier *Examples_loader*.
 
 cmd:
 ```
-./elf_dumper exemples/e1
+./elf_dumper  	Examples_loader/e1.o
 ```
 out:
 ```
@@ -45,7 +45,7 @@ out:
 ```
 Une cmd pour exécuter tout le programme
 ```
-./elf_dumper -x -s -S -h -r exemples/e1
+./elf_dumper -x -s -S -h -r  	Examples_loader/e1.o
 ```
 
 Un exemple sur le fonctionnement de la fusion
