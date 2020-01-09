@@ -1445,16 +1445,14 @@ void etape5(FILE *file)
 {
    if(!fread(&header, 1, sizeof(header), file))
    {
-      printf("ERREUR fread");
-      exit(1);
+      //ignore
    }
    for (int i = 0; i < header.e_shnum; i++)
    {
       fseek(file, header.e_shoff + i * sizeof(section), SEEK_SET);
       if (!fread(&section, 1, sizeof(section), file))
       {
-         printf("ERREUR fread");
-         exit(1);
+         //ignore
       }
       section_to_little_endian();
       if (section.sh_type == 4 || section.sh_type == 9)
@@ -1468,8 +1466,7 @@ void etape5(FILE *file)
             {
                if (!fread(&rela, 1, sizeof(rela), file))
                {
-                  printf("ERREUR fread");
-                  exit(1);
+                  //ignore
                }
                rela_to_little_endian();
                printf("Decalage: %x |", rela.r_offset);
@@ -1480,8 +1477,7 @@ void etape5(FILE *file)
             {
                if (!fread(&rel, 1, sizeof(rel), file))
                {
-                  printf("ERREUR fread");
-                  exit(1);
+                  //ignore
                }
                rel_to_little_endian();
                printf("Decalage: %x |", rel.r_offset);
