@@ -53,9 +53,9 @@ void symbol_to_little_endian()
 {
    if (ENDIAN == 1)
    {
-      symb.st_name = reverse_2(symb.st_name);
-      symb.st_value = reverse_2(symb.st_value);
-      symb.st_size = reverse_2(symb.st_size);
+      symb.st_name = reverse_4(symb.st_name);
+      symb.st_value = reverse_4(symb.st_value);
+      symb.st_size = reverse_4(symb.st_size);
       /*
    These are already in unsigned char, can't be swapped.
    symb.st_info = reverse_4(symb.st_info);
@@ -1285,7 +1285,7 @@ void etape4(FILE *file)
       symbol_to_little_endian();
 
       printf("Num: %d |", i);
-      printf("Valeur: %x |", symb.st_value);
+      printf("Valeur: %08x |", symb.st_value);
       printf("Taille: %d |", symb.st_size);
       //printf("Type : %x  ", symb.st_info);
       switch (symb.st_info)
