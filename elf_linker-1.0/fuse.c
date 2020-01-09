@@ -37,7 +37,10 @@ void surf_sections1()
 
     unsigned char *buff = malloc(sizeof(unsigned char) * Sections1[i].section.sh_size);
     fseek(file1, Sections1[i].section.sh_offset, SEEK_SET);
-    fread(Sections1[i].buff, Sections1[i].section.sh_size, 1, file1);
+    reader = fread(Sections1[i].buff, Sections1[i].section.sh_size, 1, file1);
+    if(reader != 1){
+           //ignore
+    }
     printb(Sections1[i].buff, Sections1[i].section.sh_size);
   }
 }
@@ -50,7 +53,10 @@ void surf_sections2()
 
     unsigned char *buff = malloc(sizeof(unsigned char) * Sections2[i].section.sh_size);
     fseek(file2, Sections2[i].section.sh_offset, SEEK_SET);
-    fread(Sections2[i].buff, Sections2[i].section.sh_size, 1, file2);
+    reader = fread(Sections2[i].buff, Sections2[i].section.sh_size, 1, file2);
+    if(reader != 1){
+            //ignore
+    }
     printb(Sections2[i].buff, Sections2[i].section.sh_size);
 
     printf("\n");
@@ -131,7 +137,6 @@ void append_symbol(Elf32_Sym s, FILE *f,Elf32_Ehdr h, Elf32_Shdr sec)
   symbols[symb_n] = s;
   symb_n++;
   char *name =   get_func_name2(f,h,sec.sh_link,s.st_name);
-  printf("%s \n",name);
   printbin(name,strlen(name));
 }
 
@@ -158,12 +163,18 @@ void fuse_symbols()
   }
 
   fseek(file1, header.e_shoff + indice_tab_symb1 * sizeof(section1), SEEK_SET); //on va a la section de la table des symboles
-  fread(&section1, 1, sizeof(section1), file1);
+  reader = fread(&section1, 1, sizeof(section1), file1);
+  if(reader != sizeof(section1)){
+            //ignore
+  }
   section_to_little_endian(&section1);
   int count1 = section1.sh_size / section1.sh_entsize; //nombre d'entree dans la table des symboles
 
   fseek(file2, header.e_shoff + indice_tab_symb2 * sizeof(section2), SEEK_SET); //on va a la section de la table des symboles
-  fread(&section2, 1, sizeof(section2), file2);
+  reader = fread(&section2, 1, sizeof(section2), file2);
+  if(reader != sizeof(section2)){
+            //ignore;
+  }
   section_to_little_endian(&section2);
   int count2 = section2.sh_size / section2.sh_entsize; //nombre d'entree dans la table des symboles
   symbols = malloc(sizeof(Elf32_Sym) * max(count1, count2));
@@ -176,9 +187,15 @@ void fuse_symbols()
     for (int j = 0; j < count2; j++)
     {
 
-      fread(&symb1, 1, sizeof(symb1), file1);
+      reader = fread(&symb1, 1, sizeof(symb1), file1);
+      if(reader != sizeof(symb1)){
+            //ignore
+      }
       symbol_to_little_endian();
-      fread(&symb2, 1, sizeof(symb2), file2);
+      reader = fread(&symb2, 1, sizeof(symb2), file2);
+      if(reader != sizeof(symb2)){
+            //ignore
+      }
       symbol_to_little_endian();
       switch (ELF32_ST_BIND(symb1.st_info))
       {
@@ -223,7 +240,7 @@ void fuse_symbols()
             {
               //l'edition de lien echoue completement
               printf("ERROR SAME NAME\n");
-              exit(1);
+            //  exit(1);
             }
             if (symb1.st_shndx == SHN_UNDEF && symb2.st_shndx != SHN_UNDEF)
             {
