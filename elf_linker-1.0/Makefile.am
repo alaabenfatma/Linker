@@ -11,7 +11,7 @@ AM_CFLAGS+=-D BIG_ENDIAN_SIMULATOR
 
 LDADD=-lpthread
 
-
+COMMON=debug.h debug.c util.h util.c brain.h  elf_dumper.c brain.c crawler.c fuse.c
 SUBDIRS=
 SUBDIRS+=. Examples_loader
 
@@ -19,7 +19,6 @@ bin_PROGRAMS=
 bin_PROGRAMS+=ARM_runner_example
 
 
-#See the compte rendu for more details about each TARGET
 EXTRA_DIST=filtre.pl
 SIMULATOR_INTERFACE=csapp.h csapp.c scanner.h scanner.l  brain.h gdb_protocol.h gdb_protocol.c arm_simulator_interface.h arm_simulator_interface.c
 
