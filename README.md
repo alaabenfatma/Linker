@@ -113,14 +113,14 @@ jamais le résultat de elf_dumper n’est pas correct, le programme nous indique
 ----------------------------------------------Journal de bord---------------------------------------------------
 
 Semaine 1 : du 12 au 20 décembre 2019
-  - Lecture du sujet, prise en main des fichiers fournis.
-  - Implémentation de la phase 1 : étape 1, 2,3,5 et partie 4 incomplète (fichier elf_dumper).
-  - Implémentation des tests (checker.sh) de l’étape 1, 2.
-  - Début de la phase 2(fichiers crawler.c et fuse.c).
+- Lecture du sujet, prise en main des fichiers fournis.
+- Implémentation de la phase 1 : étape 1, 2,3,5 et partie 4 incomplète (fichier elf_dumper).
+- Implémentation des tests (checker.sh) de l’étape 1, 2.
+- Début de la phase 2(fichiers crawler.c et fuse.c).
 
 Semaine 2 : du 6 au 12 Janvier 2020
-	- Continuation de la phase 1 : Ajout du nom des fonctions dans l’affichage d’une section de l’étape 4.
-	- Correction des bugs de l’étape 5.
-	- Continuation de la phase 2: Etape 6 et Etape 7.
-	- Implémentation des tests ( checker.sh ) de l’étape 4. 
+ -Continuation de la phase 1 : Ajout du nom des fonctions dans l’affichage d’une section de l’étape 4.
+- Correction des bugs de l’étape 5.
+- Continuation de la phase 2: Etape 6 et Etape 7.
+- Implémentation des tests ( checker.sh ) de l’étape 4. 
 
