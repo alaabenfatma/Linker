@@ -27,7 +27,7 @@ La variable TARGET doit être remplacée par l'une des options suivantes
 
 Voir le compte rendu pour plus de détails sur chaque TARGET.
 
-### Examples
+### Exemples
 Tous les exemples sont contenus dans le dossier *exemples*.
 
 cmd:
