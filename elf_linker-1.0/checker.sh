@@ -66,9 +66,6 @@ verif_type(){
     for i in $second
     do
         first=$(readelf -S $1 | sed '1,4'd | egrep "]" | cut -d"]" -f2 | sed -n ${compteur}p | tr -d " ")
-        #echo "$first" | egrep -q "$i"
-        #echo "$first"
-        #echo "$i"
         if [[ $? -ne 0 ]] ;then
             Flag=1
             return $Flag
