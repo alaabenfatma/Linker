@@ -139,7 +139,7 @@ nombre_de_section(){
         Flag_nb_section=1
         #nombre d'entrée de la tables des symboles différent"
     else
-        second=$(readelf -s $1 | egrep "La table de symboles" | cut -d" " -f7)
+        second=$(readelf -s $1 | egrep "Table de symboles" | cut -d" " -f8)
         if [[ $first -ne $second ]]
         then
            Flag_nb_section=1 
@@ -238,7 +238,7 @@ etape5(){
     if [[ -z $first ]]
     then
         second=$(readelf -r $f | sed "1,1"d)
-        test="Il n'y a pas de réadressage dans ce fichier."
+        test="Il n'y a pas de relocalisation dans ce fichier."
         if [[ $second == $test ]]
         then
             echo "GOOD TEST"
@@ -269,7 +269,7 @@ etape6(){
     
     echo "file 3: "
     read f3;
-    ./fuse $f1 $f2 $f3
+    ./$1 $f1 $f2 $f3
     xxd $f1 > tmpf1
     xxd $f2 > tmpf2
     xxd $f3 > tmpf3
