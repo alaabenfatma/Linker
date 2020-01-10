@@ -1,9 +1,9 @@
 affiche_etape(){
     echo "Choisir une Etape à vérifier: "
     echo "  1 - Etape 1    5 - Etape 5"
-    echo "  2 - Etape 2    6 - Tout"
-    echo "  3 - Etape 3    7 - fin"
-    echo "  4 - Etape 4"
+    echo "  2 - Etape 2    6 - Partie 1"
+    echo "  3 - Etape 3    7 - Etape 6"
+    echo "  4 - Etape 4    8 - fin"
     echo "Etape à vérifier:"
 }
 option(){
@@ -159,8 +159,9 @@ type_etape_4(){
 }
 lien_etape_4(){
     Flag_lien=0
-    list_lien1=$(./$2 -s $1 | egrep "Type" | cut -d":" -f6 | cut -d"|" -f1 | tr -d " " )
-    list_lien2=$(readelf -s $1 | sed "1,3"d | tr -s " " | cut -d" " -f6)
+    list_lien1=$(./$2 -s $1 | egrep "Type" | cut -d":" -f6 | cut -d"|" -f1 | tr -d " " | tr -d " \n")
+    list_lien2=$(readelf -s $1 | sed "1,3"d | tr -s " " | cut -d" " -f6 | tr -d " \n")
+    
     if [[ $list_lien1 != $list_lien2 ]]
     then
         Flag_lien=1
@@ -256,6 +257,30 @@ ensemble(){
     etape5 $1
 }
 #######################
+######## Fusion########
+
+etape6(){
+
+    echo "file 1: "
+    read f1;
+    
+    echo "file 2: "
+    read f2;
+    
+    echo "file 3: "
+    read f3;
+    ./fuse $f1 $f2 $f3
+    xxd $f1 > tmpf1
+    xxd $f2 > tmpf2
+    xxd $f3 > tmpf3
+    echo "$f1 VS $f3"
+    diff tmpf1 tmpf3
+    echo "$f2 VS $f3"
+    diff tmpf2 tmpf3
+
+}
+
+#######################
 ######## MAIN #########
 tmp=0
 
@@ -311,6 +336,12 @@ do
                     read no_etape;
                     ;;
                     7)
+                    etape6 $programme
+                    echo "*******************************************"
+                    affiche_etape
+                    read no_etape;
+                    ;;
+                    8)
                     tmp2=1
                     ;;
                     *)
