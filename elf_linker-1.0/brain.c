@@ -1278,7 +1278,7 @@ char *get_func_name(FILE *f)
    fseek(f, sec.sh_offset + symb.st_name, SEEK_SET);
    char c = fgetc(f);
    int i = 0;
-   while (c != '\0' && i < 30)
+   while (c != '\0' && i < 256)
    {
       name[i] = c;
       i++;
